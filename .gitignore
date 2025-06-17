@@ -1,7 +1,23 @@
-# Node.js
-node_modules/
-.env
-dist/
-build/
-npm-debug.log
+# macOS system files
 .DS_Store
+*/.DS_Store
+**/.DS_Store
+
+# Android build files
+/android/app/.cxx/
+/android/build/
+/android/app/build/
+
+# iOS build files
+/ios/build/
+/ios/Pods/
+
+# Node modules
+/node_modules/
+
+# Ruby vendor files
+/vendor/
+
+# General build artifacts
+*.apk
+*.so
