@@ -1,0 +1,10 @@
+{
+  "enabled": true,
+  "prefabPath": "/Users/anirudhsingh/.gradle/caches/modules-2/files-2.1/com.google.prefab/cli/2.1.0/aa32fec809c44fa531f01dcfb739b5b3304d3050/cli-2.1.0-all.jar",
+  "packages": [
+    "/Users/anirudhsingh/.gradle/caches/8.13/transforms/8cb416b8178cb0e7f140959230f7f0bf/transformed/react-android-0.79.2-debug/prefab",
+    "/Users/anirudhsingh/Desktop/UpdatedSceneZone/node_modules/react-native-reanimated/android/build/intermediates/prefab_package/debug/prefab",
+    "/Users/anirudhsingh/.gradle/caches/8.13/transforms/579d72cfca4abb6b9ed12a1bcc998c01/transformed/jsc-android-2026004.0.1/prefab",
+    "/Users/anirudhsingh/.gradle/caches/8.13/transforms/72cde7dc85b5006383f56c98fcfedfa5/transformed/fbjni-0.7.0/prefab"
+  ]
+}
