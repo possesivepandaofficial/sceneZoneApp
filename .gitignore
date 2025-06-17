@@ -1,12 +1,15 @@
 # macOS system files
 .DS_Store
-*/.DS_Store
 **/.DS_Store
 
 # Android build files
-/android/app/.cxx/
+/android/.gradle/
 /android/build/
 /android/app/build/
+/android/app/build 2/
+/android/app/.cxx/
+*.apk
+*.so
 
 # iOS build files
 /ios/build/
@@ -17,7 +20,3 @@
 
 # Ruby vendor files
 /vendor/
-
-# General build artifacts
-*.apk
-*.so
