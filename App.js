@@ -9,11 +9,9 @@ import SplashScreen from './Src/HOSTFLOW/Screens/SplashScreen';
 import OnboardScreen from './Src/HOSTFLOW/Screens/OnboardScreen';
 import SignUpScreen from './Src/HOSTFLOW/Screens/SignupScreen';
 import SigninScreen from './Src/HOSTFLOW/Screens/SigninScreen';
-
-
 //Host screens
 import OtpVerificationScreen from './Src/HOSTFLOW/Screens/OtpVerificationScreen';
-import ForgotPasswordScreen from './Src/HOSTFLOW/Screens/ForgotPasswordScreen';
+import ForgotPasswordScreen from './Src/HOSTFLOW/Screens/ForgotPasswordScreen'
 import CheckMailboxScreen from './Src/HOSTFLOW/Screens/CheckMailBoxScreen';
 import CreateNewPasswordScreen from './Src/HOSTFLOW/Screens/CreateNewPasswordScreen';
 import BottomTabNavigator from './Src/HOSTFLOW/Components/BottomTabNavigator';
@@ -252,7 +250,7 @@ export default function App() {
             <Stack.Screen name="HomeScreen" component={HomeScreen} />
             <Stack.Screen name="HostVerifiedScreen" component={HostVerifiedScreen} />
             <Stack.Screen name="HostAddPayment" component={HostAddPayment} />
-            <Stack.Screen name="ForgotPasswordScreen" component={ForgotPasswordScreen} />
+            <Stack.Screen name="ForgotPasswordScreen" component={ForgotPasswordScreen} />            <Stack.Screen name="ForgotPasswordScreen" component={ForgotPasswordScreen} />
             <Stack.Screen name="HostDiscount" component={HostDiscount} />
             <Stack.Screen name="UserVerifiedScreen" component={UserVerifiedScreen} />
             <Stack.Screen name="UserTicketDownload" component={UserTicketDownload} />

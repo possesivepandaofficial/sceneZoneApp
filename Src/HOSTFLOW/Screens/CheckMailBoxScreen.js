@@ -8,16 +8,18 @@ import {
   Dimensions,
   SafeAreaView,
   ScrollView,
+  Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Feather';
 import LinearGradient from 'react-native-linear-gradient';
 import SignUpBackground from '../assets/Banners/SignUp';
 import MailboxIcon from '../assets/icons/mailbox';
+import api from '../Config/api';
 
 const { width, height } = Dimensions.get('window');
 
-const CheckMailboxScreen = ({ navigation }) => {
+const CheckMailboxScreen = ({ navigation, route }) => {
   const [otp, setOtp] = useState(['', '', '', '']);
   const insets = useSafeAreaInsets();
   const inputRefs = [
@@ -26,6 +28,8 @@ const CheckMailboxScreen = ({ navigation }) => {
     useRef(null),
     useRef(null),
   ];
+  // Get email from navigation params
+  const email = route?.params?.email || '';
 
   const handleOtpChange = (text, index) => {
     const newOtp = [...otp];
@@ -39,12 +43,46 @@ const CheckMailboxScreen = ({ navigation }) => {
     }
   };
 
-  const handleResendOTP = () => {
-    // Handle resend OTP logic
+  const handleResendOTP = async () => {
+    if (!email) {
+      Alert.alert('Error', 'Email is missing.');
+      return;
+    }
+    try {
+      const response = await api.post('/host/auth/resend-otp', {
+        email
+      });
+      if (response.data.success) {
+        Alert.alert('Success', 'OTP resent successfully!');
+      } else {
+        Alert.alert('Error', response.data.message || 'Failed to resend OTP');
+      }
+    } catch (error) {
+      Alert.alert('Error', error.response?.data?.message || 'Failed to resend OTP');
+    }
   };
 
-  const handleConfirm = () => {
-    navigation.navigate('CreateNewPassword');
+  const handleConfirm = async () => {
+    const code = otp.join('');
+    if (!email || code.length !== 4) {
+      Alert.alert('Error', 'Please enter the 4-digit OTP and make sure email is present.');
+      return;
+    }
+    try {
+      const response = await api.post('/host/email-verifyOtp', {
+        email,
+        code
+      });
+      if (response.data.success) {
+        Alert.alert('Success', 'OTP verified successfully!', [
+          { text: 'OK', onPress: () => navigation.navigate('CreateNewPassword', { email }) }
+        ]);
+      } else {
+        Alert.alert('Error', response.data.message || 'OTP verification failed');
+      }
+    } catch (error) {
+      Alert.alert('Error', error.response?.data?.message || 'OTP verification failed');
+    }
   };
 
   return (
@@ -251,3 +289,4 @@ const styles = StyleSheet.create({
 });
 
 export default CheckMailboxScreen;
+

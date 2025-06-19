@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,11 +10,16 @@ import {
   TextInput,
   Platform,
   Dimensions,
+  Alert,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import LinearGradient from 'react-native-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSelector } from 'react-redux';
+import { selectToken, selectUserData } from '../Redux/slices/authSlice';
+import api from '../Config/api';
+import * as ImagePicker from 'react-native-image-picker';
 
 const { width, height } = Dimensions.get('window');
 
@@ -47,11 +52,141 @@ const dimensions = {
 };
 
 const HostEditProfileScreen = ({ navigation }) => {
-  const [fullName, setFullName] = useState('Michael De Santa');
-  const [email, setEmail] = useState('michael.santa@email.com');
-  const [location, setLocation] = useState('Yogyakarta');
-  const [phoneNumber, setPhoneNumber] = useState('9876543210');
+  const token = useSelector(selectToken);
+  const userData = useSelector(selectUserData);
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [location, setLocation] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState(userData?.mobileNumber ? String(userData.mobileNumber) : '');
+  const [profileImage, setProfileImage] = useState(null);
+  const [loading, setLoading] = useState(false);
   const insets = useSafeAreaInsets();
+
+  useEffect(() => {
+    setFullName(userData?.fullName || userData?.name || '');
+    setEmail(userData?.email || '');
+    setLocation(userData?.location || '');
+    setPhoneNumber(userData?.mobileNumber ? String(userData.mobileNumber) : '');
+    fetchProfileData();
+  }, []);
+
+  const fetchProfileData = async () => {
+    try {
+      const response = await api.get('/host/get-profile', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.data.success) {
+        const data = response.data.data;
+        setFullName(data.fullName || data.name || '');
+        setEmail(data.email || '');
+        setLocation(data.location || '');
+        setProfileImage(data.profileImageUrl ? { uri: data.profileImageUrl } : null);
+        if (!userData?.mobileNumber && data.mobileNumber) {
+          setPhoneNumber(String(data.mobileNumber));
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      Alert.alert('Error', 'Failed to fetch profile data');
+    }
+  };
+
+  const handleImagePicker = () => {
+    Alert.alert(
+      'Choose Image Source',
+      'Select image from',
+      [
+        {
+          text: 'Camera',
+          onPress: () => launchCamera(),
+        },
+        {
+          text: 'Gallery',
+          onPress: () => launchGallery(),
+        },
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+      ]
+    );
+  };
+
+  const launchCamera = () => {
+    ImagePicker.launchCamera({
+      mediaType: 'photo',
+      quality: 0.8,
+      includeBase64: true,
+    }, (response) => {
+      if (response.didCancel) {
+        return;
+      }
+      if (response.errorCode) {
+        Alert.alert('Error', response.errorMessage);
+        return;
+      }
+      setProfileImage(response.assets[0]);
+    });
+  };
+
+  const launchGallery = () => {
+    ImagePicker.launchImageLibrary({
+      mediaType: 'photo',
+      quality: 0.8,
+      includeBase64: true,
+    }, (response) => {
+      if (response.didCancel) {
+        return;
+      }
+      if (response.errorCode) {
+        Alert.alert('Error', response.errorMessage);
+        return;
+      }
+      setProfileImage(response.assets[0]);
+    });
+  };
+
+  const handleSaveChanges = async () => {
+    try {
+      setLoading(true);
+
+      const formData = new FormData();
+      formData.append('fullName', fullName);
+      formData.append('location', location);
+      formData.append('email', email);
+      
+      if (profileImage && profileImage.uri) {
+        formData.append('profileImage', {
+          uri: profileImage.uri,
+          type: profileImage.type || 'image/jpeg',
+          name: profileImage.fileName || 'profile.jpg',
+        });
+      }
+
+      const response = await api.patch('/host/update-profile', formData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (response.data.success) {
+        Alert.alert('Success', 'Profile updated successfully');
+        navigation.navigate('MainTabs');
+      } else {
+        Alert.alert('Error', response.data.message || 'Failed to update profile');
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      Alert.alert('Error', error.response?.data?.message || 'Failed to update profile');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -89,15 +224,13 @@ const HostEditProfileScreen = ({ navigation }) => {
           }
         ]}>
           <Image
-            source={require('../assets/Images/frame1.png')}
+            source={profileImage ? { uri: profileImage.uri } : require('../assets/Images/frame1.png')}
             style={styles.profileImage}
           />
           <TouchableOpacity
             style={styles.cameraIconContainer}
-            onPress={() => {
-              console.log('Camera button pressed');
-            }}>
-            <MaterialIcons name="camera-alt" size={28} color="#fff" />
+            onPress={handleImagePicker}>
+            <MaterialIcons name="camera-alt" size={Math.max(dimensions.iconSize * 0.8, 16)} color="#fff" />
           </TouchableOpacity>
         </View>
 
@@ -115,14 +248,20 @@ const HostEditProfileScreen = ({ navigation }) => {
 
         <View style={styles.inputContainer}>
           <Text style={styles.inputLabel}>Email</Text>
-          <TextInput
-            style={[styles.input, { borderColor: '#24242D' }]}
-            value={email}
-            onChangeText={setEmail}
-            placeholder="Email"
-            placeholderTextColor="#888"
-            keyboardType="email-address"
-          />
+          <View style={styles.emailInputWrapper}>
+            <TextInput
+              style={[styles.input, { flex: 1, borderColor: 'transparent', borderWidth: 0 }]}
+              value={email}
+              onChangeText={setEmail}
+              placeholder="Email"
+              placeholderTextColor="#888"
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+            <TouchableOpacity style={styles.verifyButton}>
+              <Text style={styles.verifyButtonText}>Verify</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         <View style={styles.inputContainer}>
@@ -140,15 +279,14 @@ const HostEditProfileScreen = ({ navigation }) => {
         <View style={styles.inputContainer}>
           <Text style={styles.inputLabel}>Phone number</Text>
           <View style={styles.phoneInputContainer}>
-            {/* Country Code Picker Placeholder */}
             <View style={styles.countryCodePicker}>
               <Text style={styles.countryCodeText}>+91</Text>
               <MaterialIcons name="keyboard-arrow-down" size={dimensions.iconSize} color="#fff" />
             </View>
             <TextInput
-              style={styles.phoneInput}
+              style={[styles.phoneInput, { color: '#888' }]}
               value={phoneNumber}
-              onChangeText={setPhoneNumber}
+              editable={false}
               placeholder="Phone Number"
               placeholderTextColor="#888"
               keyboardType="phone-pad"
@@ -166,6 +304,8 @@ const HostEditProfileScreen = ({ navigation }) => {
           }
         ]}
         activeOpacity={0.85}
+        onPress={handleSaveChanges}
+        disabled={loading}
       >
         <LinearGradient
           colors={['#B15CDE', '#7952FC']}
@@ -182,7 +322,9 @@ const HostEditProfileScreen = ({ navigation }) => {
             gap: 10,
           }}
         >
-          <Text style={styles.saveButtonText}>Save Changes</Text>
+          <Text style={styles.saveButtonText}>
+            {loading ? 'Saving...' : 'Save Changes'}
+          </Text>
         </LinearGradient>
       </TouchableOpacity>
     </SafeAreaView>
@@ -293,6 +435,24 @@ const styles = StyleSheet.create({
     backgroundColor: '#121212',
     color: '#fff',
     fontSize: dimensions.fontSize.title,
+  },
+  emailInputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 48,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#8D6BFC',
+  },
+  verifyButton: {
+    paddingLeft: 8, // Adjust as needed for spacing
+  },
+  verifyButtonText: {
+    color: '#B15CDE',
+    fontFamily: 'Nunito Sans',
+    fontSize: 14,
+    fontWeight: '400',
   },
   phoneInputContainer: {
     flexDirection: 'row',

@@ -9,6 +9,7 @@ import {
   useColorScheme,
   Dimensions,
   ScrollView,
+  Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Feather';
@@ -16,15 +17,57 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
 import SignUpBackground from '../assets/Banners/SignUp';
 import ForgotIcon from '../assets/icons/forgot';
+import api from '../Config/api';
 
 const { width, height } = Dimensions.get('window');
 
 const ForgotPasswordScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const insets = useSafeAreaInsets();
 
-  const handleConfirm = () => {
-    navigation.navigate('CheckMailBox');
+  const handleConfirm = async () => {
+    try {
+      // Input validation
+      if (!email.trim()) {
+        Alert.alert('Error', 'Please enter your email address');
+        return;
+      }
+
+      // Basic email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email.trim())) {
+        Alert.alert('Error', 'Please enter a valid email address');
+        return;
+      }
+
+      setIsLoading(true);
+
+      const otpData = {
+        email: email.trim()
+      };
+
+      console.log("Sending OTP Data:", otpData); // Debug log
+
+      const response = await api.post('/host/email-sendOtp', otpData);
+
+      console.log("OTP Response:", response.data); // Debug log
+
+      if (response.data) {
+        // Navigate to check mailbox screen
+        navigation.navigate('CheckMailBox', { email: email.trim() });
+      }
+    } catch (error) {
+      console.error("OTP Error:", error.message);
+      console.error("Error Response:", error.response?.data);
+      
+      Alert.alert(
+        'Error',
+        error.response?.data?.message || 'Failed to send OTP. Please try again.'
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -48,7 +91,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
               <ForgotIcon width={53} height={52} />
             </View>
 
-            <Text style={styles.title}>Forgot Your Password?</Text>
+            <Text style={styles.title}>Forgot  Your Password?</Text>
             <Text style={styles.description}>
               Please enter your email address account to send the OTP
               verification to reset your password
@@ -65,20 +108,27 @@ const ForgotPasswordScreen = ({ navigation }) => {
                 onChangeText={setEmail}
                 keyboardType="email-address"
                 autoCapitalize="none"
+                editable={!isLoading}
               />
             </View>
           </View>
         </ScrollView>
 
         {/* Confirm Button - Fixed position */}
-        <TouchableOpacity style={[styles.confirmButton, { bottom: insets.bottom + 60 }]} onPress={handleConfirm}>
+        <TouchableOpacity 
+          style={[styles.confirmButton, { bottom: insets.bottom + 60 }]} 
+          onPress={handleConfirm}
+          disabled={isLoading}
+        >
           <LinearGradient 
             colors={['#B15CDE', '#7952FC']} 
             start={{x: 1, y: 0}}
             end={{x: 0, y: 0}}
-            style={styles.confirmButtonGradient}
+            style={[styles.confirmButtonGradient, { opacity: isLoading ? 0.7 : 1 }]}
           >
-            <Text style={styles.confirmButtonText}>Confirm</Text>
+            <Text style={styles.confirmButtonText}>
+              {isLoading ? 'Sending...' : 'Confirm'}
+            </Text>
           </LinearGradient>
         </TouchableOpacity>
       </SafeAreaView>
@@ -105,10 +155,10 @@ const styles = StyleSheet.create({
   scrollViewContent: {
     flexGrow: 1,
     paddingHorizontal: 20,
-    paddingBottom: 100, // Add padding at the bottom to prevent button from covering content
+    paddingBottom: 100, 
   },
   header: {
-    // paddingTop will be set dynamically with safe area insets
+   
   },
   contentArea: {
     flex: 1,

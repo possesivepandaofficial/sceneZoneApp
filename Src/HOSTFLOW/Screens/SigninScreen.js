@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   Dimensions,
   ScrollView,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Feather from 'react-native-vector-icons/Feather';
@@ -21,12 +22,17 @@ import SignUpBackground from '../assets/Banners/SignUp';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MobileIcon from '../assets/icons/mobile';
 import LockIcon from '../assets/icons/lock';
+import api from '../Config/api';
 
 const { width, height } = Dimensions.get('window');
 
 const SignInScreen = ({ navigation }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [mobileNumber, setMobileNumber] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isOtpLogin, setIsOtpLogin] = useState(false);
   const scheme = useColorScheme();
   const isDark = true; // force dark mode
   const dispatch = useDispatch();
@@ -46,9 +52,98 @@ const SignInScreen = ({ navigation }) => {
     paddingRight: insets.right + width * 0.05,
   };
 
-  const handleSignIn = () => {
-    // Navigate to OTP verification screen
-    navigation.navigate('OtpVerify');
+  const handleSignIn = async () => {
+    try {
+      // Input validation
+      if (!mobileNumber.trim() || isNaN(mobileNumber) || mobileNumber.length < 10) {
+        Alert.alert('Error', 'Please enter a valid mobile number (at least 10 digits)');
+        return;
+      }
+
+      if (!password.trim()) {
+        Alert.alert('Error', 'Please enter your password');
+        return;
+      }
+
+      setIsLoading(true);
+
+      const loginData = {
+        mobileNumber: parseInt(mobileNumber),
+        password: password.trim()
+      };
+
+      console.log("Login Data:", loginData); // Debug log
+
+      const response = await api.post('/host/auth/loginFromPassword', loginData);
+
+      console.log("Login Response:", response.data); // Debug log
+
+      if (response.data) {
+        // Dispatch login action with user data
+        dispatch(loginHost({
+          id: response.data.data.user.id || 'host123',
+          name: response.data.data.user.fullName || 'Kevin Richards',
+          email: response.data.data.user.email || 'host@example.com',
+          phone: response.data.data.user.mobileNumber || '+91 412-123-4215',
+          token: response.data.data.token // Store the token from the response
+        }));
+        
+        // Navigate to OTP verification screen
+        navigation.navigate('MainTabs', { mobileNumber: mobileNumber });
+      }
+    } catch (error) {
+      console.error("Login Error:", error.message);
+      console.error("Error Response:", error.response?.data);
+      
+      Alert.alert(
+        'Error',
+        error.response?.data?.message || 'Failed to sign in. Please check your credentials and try again.'
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleOtpLogin = async () => {
+    try {
+      // Input validation
+      if (!mobileNumber.trim() || isNaN(mobileNumber) || mobileNumber.length < 10) {
+        Alert.alert('Error', 'Please enter a valid mobile number (at least 10 digits)');
+        return;
+      }
+
+      setIsLoading(true);
+
+      const loginData = {
+        mobileNumber: mobileNumber
+      };
+
+      console.log("OTP Login Data:", loginData); // Debug log
+
+      const response = await api.post('/host/auth/login', loginData);
+
+      console.log("OTP Login Response:", response.data); // Debug log
+
+      if (response.data) {
+        // Navigate to OTP verification screen with mobile number
+        navigation.navigate('OtpVerify', { mobileNumber: mobileNumber });
+      }
+    } catch (error) {
+      console.error("OTP Login Error:", error.message);
+      console.error("Error Response:", error.response?.data);
+      
+      Alert.alert(
+        'Error',
+        error.response?.data?.message || 'Failed to initiate OTP login. Please try again.'
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const toggleLoginMode = () => {
+    setIsOtpLogin(!isOtpLogin);
+    setPassword(''); // Clear password when switching modes
   };
 
   return (
@@ -79,64 +174,77 @@ const SignInScreen = ({ navigation }) => {
           <View style={[styles.inputContainer, { marginTop: 0 }, { backgroundColor: cardBg, borderColor: border }]}>
             <MobileIcon width={20} height={20} style={styles.inputIcon} />
             <TextInput
-              placeholder="+91 412-123-4215"
+              placeholder="Mobile Number"
               placeholderTextColor={placeholder}
               style={[styles.input, { color: text }]}
               keyboardType="phone-pad"
+              value={mobileNumber}
+              onChangeText={setMobileNumber}
             />
           </View>
 
-          {/* Password Input */}
-          <View style={[styles.inputContainer, styles.passwordContainer, { backgroundColor: cardBg }]}>
-            <LockIcon width={20} height={20} style={styles.inputIcon} />
-            <TextInput
-              placeholder="Password"
-              placeholderTextColor={placeholder}
-              secureTextEntry={!passwordVisible}
-              style={[styles.input, { color: text, flex: 1 }]}
-            />
-            <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
-              <Feather name={passwordVisible ? 'eye' : 'eye-off'} size={20} color={placeholder} />
-            </TouchableOpacity>
-          </View>
-
-          {/* Remember / Forgot Row */}
-          <View style={styles.row}>
-            <View style={styles.rowLeft}>
-              <TouchableOpacity
-                onPress={() => setRememberMe(!rememberMe)}
-                style={{
-                  width: 18,
-                  height: 18,
-                  borderWidth: 1.5,
-                  borderColor: '#8D6BFC',
-                  borderRadius: 4,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginRight: 8,
-                  backgroundColor: rememberMe ? '#8D6BFC' : 'transparent',
-                }}
-              >
-                {rememberMe && (
-                  <Text style={{ color: '#fff', fontSize: 14, fontWeight: 'bold', lineHeight: 16 }}>✓</Text>
-                )}
+          {/* Password Input - Only show in password login mode */}
+          {!isOtpLogin && (
+            <View style={[styles.inputContainer, styles.passwordContainer, { backgroundColor: cardBg }]}>
+              <LockIcon width={20} height={20} style={styles.inputIcon} />
+              <TextInput
+                placeholder="Password"
+                placeholderTextColor={placeholder}
+                secureTextEntry={!passwordVisible}
+                style={[styles.input, { color: text, flex: 1 }]}
+                value={password}
+                onChangeText={setPassword}
+              />
+              <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
+                <Feather name={passwordVisible ? 'eye' : 'eye-off'} size={20} color={placeholder} />
               </TouchableOpacity>
-              <Text style={[styles.rememberText, { color: text }]}> Remember me</Text>
             </View>
-            <TouchableOpacity onPress={() => navigation.navigate('ForgotPasswordScreen')}>
-              <Text style={styles.forgot}>Forgot Password</Text>
-            </TouchableOpacity>
-          </View>
+          )}
+
+          {/* Remember / Forgot Row - Only show in password login mode */}
+          {!isOtpLogin && (
+            <View style={styles.row}>
+              <View style={styles.rowLeft}>
+                <TouchableOpacity
+                  onPress={() => setRememberMe(!rememberMe)}
+                  style={{
+                    width: 18,
+                    height: 18,
+                    borderWidth: 1.5,
+                    borderColor: '#8D6BFC',
+                    borderRadius: 4,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginRight: 8,
+                    backgroundColor: rememberMe ? '#8D6BFC' : 'transparent',
+                  }}
+                >
+                  {rememberMe && (
+                    <Text style={{ color: '#fff', fontSize: 14, fontWeight: 'bold', lineHeight: 16 }}>✓</Text>
+                  )}
+                </TouchableOpacity>
+                <Text style={[styles.rememberText, { color: text }]}> Remember me</Text>
+              </View>
+              <TouchableOpacity onPress={() => navigation.navigate('ForgotPasswordScreen')}>
+                <Text style={styles.forgot}>Forgot Password</Text>
+              </TouchableOpacity>
+            </View>
+          )}
 
           {/* Sign In Button */}
-          <TouchableOpacity onPress={handleSignIn}>
+          <TouchableOpacity 
+            onPress={isOtpLogin ? handleOtpLogin : handleSignIn} 
+            disabled={isLoading}
+          >
             <LinearGradient
               colors={['#B15CDE', '#7952FC']}
               start={{x: 1, y: 0}}
               end={{x: 0, y: 0}}
-              style={[styles.primaryButton, { borderRadius: 14 }]}
+              style={[styles.primaryButton, { borderRadius: 14, opacity: isLoading ? 0.7 : 1 }]}
             >
-              <Text style={styles.primaryButtonText}>Sign In</Text>
+              <Text style={styles.primaryButtonText}>
+                {isLoading ? 'Processing...' : (isOtpLogin ? 'Send OTP' : 'Sign In')}
+              </Text>
             </LinearGradient>
           </TouchableOpacity>
 
@@ -145,8 +253,10 @@ const SignInScreen = ({ navigation }) => {
             <Text style={styles.orText}>or</Text>
             <View style={styles.orLine} />
           </View>
-          <TouchableOpacity onPress={handleSignIn}>
-            <Text style={styles.loginOtp}>Login With OTP</Text>
+          <TouchableOpacity onPress={toggleLoginMode}>
+            <Text style={styles.loginOtp}>
+              {isOtpLogin ? 'Login with Password' : 'Login With OTP'}
+            </Text>
           </TouchableOpacity>
 
           {/* Google Sign In */}
