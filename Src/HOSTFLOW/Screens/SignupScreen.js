@@ -10,6 +10,7 @@ import {
   Dimensions,
   Switch,
   ScrollView,
+  Alert,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -22,10 +23,14 @@ import FullNameIcon from '../assets/icons/fullname';
 import MobileIcon from '../assets/icons/mobile';
 import LocationIcon from '../assets/icons/location';
 import LockIcon from '../assets/icons/lock';
+import api from '../Config/api';
+import { useDispatch } from 'react-redux';
+import { loginHost } from '../Redux/slices/authSlice';
 
 const { width, height } = Dimensions.get('window');
 
 const SignUpScreen = ({ navigation }) => {
+  const dispatch = useDispatch();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
 
@@ -45,9 +50,85 @@ const SignUpScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSignUp = () => {
-    navigation.navigate('SignIn');
+  const handleSignUp = async () => {
+    console.log("Sign Up button pressed"); // Debug: Confirm button press
+
+    // Input validation
+    if (!fullName.trim()) {
+      Alert.alert('Error', 'Please enter your full name');
+      return;
+    }
+
+    if (!mobile.trim() || isNaN(mobile) || mobile.length < 10) {
+      Alert.alert('Error', 'Please enter a valid mobile number (at least 10 digits)');
+      return;
+    }
+
+    if (!password.trim()) {
+      Alert.alert('Error', 'Please enter a password');
+      return;
+    }
+
+    const signupData = {
+      fullName: fullName.trim(),
+      mobileNumber: parseInt(mobile),
+      password: password.trim(),
+      isRemember: rememberMe,
+      location: location.trim(),
+    };
+
+    console.log("Signup Data:", signupData); // Debug: Inspect data being sent
+
+    try {
+      setIsLoading(true);
+
+      const response = await api.post('/host/auth/signup', signupData);
+
+      console.log("API Response host:", response.data); // Debug: Log API response
+
+      if (response.data) {
+        // Store user data in Redux with all required fields
+        dispatch(loginHost({
+          id: response.data.data?.id || 'host123',
+          name: fullName.trim(),
+          fullName: fullName.trim(),
+          email: response.data.data?.email || '',
+          phone: mobile,
+          mobileNumber: parseInt(mobile),
+          location: location.trim(),
+          role: 'host',
+          token: response.data.data?.token || null
+        }));
+
+        // Log the Redux state after dispatch
+        console.log("User data stored in Redux:", {
+          fullName: fullName.trim(),
+          mobileNumber: parseInt(mobile),
+          location: location.trim(),
+          role: 'host'
+        });
+
+        Alert.alert('Success', 'Account created successfully!', [
+          { 
+            text: 'OK', 
+            onPress: () => navigation.navigate('OtpVerify', { 
+              mobileNumber: mobile
+            }) 
+          },
+        ]);
+      }
+    } catch (error) {
+      console.error("Signup Error:", error.message);
+      console.error("Error Response:", error.response?.data);
+      Alert.alert(
+        'Error',
+        error.response?.data?.message || 'Failed to sign up. Please check your network or try again later.'
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -140,14 +221,16 @@ const SignUpScreen = ({ navigation }) => {
             <Text style={{ color: '#fff' }}> Remember me</Text>
           </View>
 
-          <TouchableOpacity onPress={handleSignUp}>
+          <TouchableOpacity onPress={handleSignUp} disabled={isLoading}>
             <LinearGradient 
               colors={['#B15CDE', '#7952FC']} 
               start={{x: 1, y: 0}}
               end={{x: 0, y: 0}}
-              style={styles.signupButton}
+              style={[styles.signupButton, isLoading && { opacity: 0.7 }]}
             >
-              <Text style={styles.signupButtonText}>Sign Up</Text>
+              <Text style={styles.signupButtonText}>
+                {isLoading ? 'Signing Up...' : 'Sign Up'}
+              </Text>
             </LinearGradient>
           </TouchableOpacity>
 
@@ -274,7 +357,7 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 1)',
   },
   orText: {
-    fontSize:11,
+    fontSize: 11,
     textAlign: 'center',
     marginBottom: 25,
   },
@@ -311,7 +394,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: 'center',
     marginTop: 10,
-  
   },
   linkText: {
     color: '#A020F0',

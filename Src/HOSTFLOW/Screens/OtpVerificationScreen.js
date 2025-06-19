@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Dimensions,
   Modal,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import { useDispatch } from 'react-redux';
@@ -16,6 +17,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import SignUpBackground from '../assets/Banners/SignUp';
 import OtpIcon from '../assets/icons/otp';
 import LinearGradient from 'react-native-linear-gradient';
+import api from '../Config/api';
 
 const { width, height } = Dimensions.get('window');
 
@@ -55,12 +57,17 @@ const dimensions = {
   modalImageSize: Math.max(width * 0.2, 80),
 };
 
-const OtpVerificationScreen = ({ navigation }) => {
+const OtpVerificationScreen = ({ navigation, route }) => {
   const [otp, setOtp] = useState(['', '', '', '']);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isResending, setIsResending] = useState(false);
   const inputs = useRef([]);
   const dispatch = useDispatch();
   const insets = useSafeAreaInsets();
+
+  // Get mobile number from navigation params
+  const mobileNumber = route.params?.mobileNumber ;
 
   // Enhanced responsive dimensions with safe area considerations
   const responsiveDimensions = {
@@ -115,15 +122,88 @@ const OtpVerificationScreen = ({ navigation }) => {
     }
   };
 
-  const handleVerify = () => {
-    dispatch(loginHost({
-      id: 'host123',
-      name: 'Kevin Richards',
-      email: 'host@example.com',
-      phone: '+91 412-123-4215'
-    }));
-    
-    navigation.navigate('HostVerifiedScreen');
+  const handleVerify = async () => {
+    try {
+      // Validate OTP
+      if (otp.some(digit => !digit)) {
+        Alert.alert('Error', 'Please enter complete OTP');
+        return;
+      }
+
+      setIsLoading(true);
+      
+      const otpData = {
+        mobileNumber: mobileNumber,
+        code: otp.join('')
+      };
+
+      console.log("Verifying OTP:", otpData); // Debug log
+
+      const response = await api.post('/host/auth/verify-otp', otpData);
+
+      console.log("OTP Verification Response:", response.data); // Debug log
+
+      if (response.data) {
+        setShowSuccess(true);
+        // Dispatch login action with user data
+        dispatch(loginHost({
+          id: response.data.id || 'host123',
+          name: response.data.name || 'Kevin Richards',
+          email: response.data.email || 'host@example.com',
+          phone: response.data.phone || '+91 412-123-4215',
+          token: response.data.token
+        }));
+        
+        // Navigate after a short delay to show success modal
+        setTimeout(() => {
+          navigation.navigate('HostVerifiedScreen');
+        }, 1500);
+      }
+    } catch (error) {
+      console.error("OTP Verification Error:", error.message);
+      console.error("Error Response:", error.response?.data);
+      
+      Alert.alert(
+        'Error',
+        error.response?.data?.message || 'Failed to verify OTP. Please try again.'
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    try {
+      setIsResending(true);
+      
+      const resendData = {
+        mobileNumber: mobileNumber
+      };
+
+      console.log("Resending OTP:", resendData); // Debug log
+
+      const response = await api.post('/host/auth/resend-otp', resendData);
+
+      console.log("Resend OTP Response:", response.data); // Debug log
+
+      if (response.data) {
+        Alert.alert('Success', 'OTP has been resent successfully!');
+        // Clear existing OTP
+        setOtp(['', '', '', '']);
+        // Focus on first input
+        inputs.current[0]?.focus();
+      }
+    } catch (error) {
+      console.error("Resend OTP Error:", error.message);
+      console.error("Error Response:", error.response?.data);
+      
+      Alert.alert(
+        'Error',
+        error.response?.data?.message || 'Failed to resend OTP. Please try again.'
+      );
+    } finally {
+      setIsResending(false);
+    }
   };
 
   return (
@@ -191,19 +271,27 @@ const OtpVerificationScreen = ({ navigation }) => {
             ))}
           </View>
 
-          <TouchableOpacity onPress={handleVerify}>
+          <TouchableOpacity onPress={handleVerify} disabled={isLoading}>
             <LinearGradient 
               colors={['#B15CDE', '#7952FC']} 
               start={{x: 1, y: 0}}
               end={{x: 0, y: 0}}
-              style={styles.primaryButton}
+              style={[styles.primaryButton, isLoading && { opacity: 0.7 }]}
             >
-              <Text style={styles.primaryButtonText}>Verify</Text>
+              <Text style={styles.primaryButtonText}>
+                {isLoading ? 'Verifying...' : 'Verify'}
+              </Text>
             </LinearGradient>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.resendButton}>
-            <Text style={styles.resendText}>Resend OTP</Text>
+          <TouchableOpacity 
+            style={[styles.resendButton, isResending && { opacity: 0.7 }]} 
+            onPress={handleResendOtp}
+            disabled={isResending}
+          >
+            <Text style={styles.resendText}>
+              {isResending ? 'Resending...' : 'Resend OTP'}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>

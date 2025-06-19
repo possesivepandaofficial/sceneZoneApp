@@ -1,9 +1,10 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, SafeAreaView, ActivityIndicator, Alert } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
-import { useDispatch } from 'react-redux';
-import { logout } from '../Redux/slices/authSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout, selectToken, selectUserData, selectLocation, selectFullName, selectMobileNumber } from '../Redux/slices/authSlice';
 import HostEditProfileScreen from './HostEditProfile';
+import api from '../Config/api';
 
 const settings = [
   { icon: 'user', label: 'Edit Profile', nav: 'HostEditProfile' },
@@ -16,18 +17,86 @@ const settings = [
 
 const ProfileScreen = ({ navigation }) => {
   const dispatch = useDispatch();
+  const [profileData, setProfileData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
+  // Get data from Redux using selectors
+  const token = useSelector(selectToken);
+  const userData = useSelector(selectUserData);
+  const location = useSelector(selectLocation);
+  const fullName = useSelector(selectFullName);
+  const mobileNumber = useSelector(selectMobileNumber);
+
+  useEffect(() => {
+    console.log('Current Redux State:', {
+      token,
+      userData,
+      location,
+      fullName,
+      mobileNumber
+    });
+    fetchProfile();
+  }, []);
+
+  const fetchProfile = async () => {
+    try {
+      if (!token) {
+        console.error('No token available in Redux store');
+        Alert.alert('Error', 'Authentication token not found. Please login again.');
+        setLoading(false);
+        return;
+      }
+
+      console.log('Making API request with token:', token);
+
+      const response = await api.get('/host/get-profile', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      console.log('Profile API Response:', response.data);
+      
+      if (response.data.success) {
+        setProfileData(response.data.data);
+      } else {
+        console.error('API returned success: false', response.data);
+        Alert.alert('Error', response.data.message || 'Failed to fetch profile data');
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error.message);
+      if (error.response) {
+        console.error('Error response data:', error.response.data);
+        console.error('Error response status:', error.response.status);
+        Alert.alert('Error', error.response.data?.message || 'Failed to fetch profile data');
+      } else if (error.request) {
+        console.error('Error request:', error.request);
+        Alert.alert('Error', 'No response from server. Please check your internet connection.');
+      } else {
+        console.error('Error message:', error.message);
+        Alert.alert('Error', 'An unexpected error occurred');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogout = () => {
-    // Dispatch logout action to clear auth state
     dispatch(logout());
-    // Completely reset navigation stack - no previous login history
     navigation.reset({
       index: 0,
       routes: [{ name: 'Onboard1' }],
     });
-    // Additional cleanup: ensure no cached navigation state
-    // This prevents users from using back button to return to authenticated screens
   };
+
+  if (loading) {
+    return (
+      <View style={[styles.container, styles.loadingContainer]}>
+        <ActivityIndicator size="large" color="#8D6BFC" />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -43,8 +112,9 @@ const ProfileScreen = ({ navigation }) => {
           <View style={styles.profileContent}>
             <Image source={require('../assets/Images/frame1.png')} style={styles.avatar} />
             <View style={{ marginLeft: 16 }}>
-              <Text style={styles.profileName}>Kevin Richards</Text>
-              <Text style={styles.profileEmail}>contact@yourdomain.com</Text>
+              <Text style={styles.profileName}>{profileData?.fullName || fullName || 'Loading...'}</Text>
+              <Text style={styles.profileEmail}>{profileData?.email || userData?.email || 'No email provided'}</Text>
+              <Text style={styles.profileLocation}>{location || 'No location provided'}</Text>
             </View>
           </View>
         </View>
@@ -136,6 +206,12 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     marginTop: 2,
   },
+  profileLocation: {
+    color: '#e0dfff',
+    fontSize: 12,
+    fontWeight: '400',
+    marginTop: 2,
+  },
   profileWaveIcon: {
     marginLeft: 'auto',
     opacity: 0.7,
@@ -204,6 +280,10 @@ const styles = StyleSheet.create({
     lineHeight: 21,
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+  },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

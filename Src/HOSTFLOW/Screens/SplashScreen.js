@@ -40,7 +40,7 @@ const SplashScreen = () => {
               navigation.replace('UserHome', { isLoggedIn: true });
               break;
             case 'host':
-              navigation.replace('Home'); // BottomTabNavigator with HomeScreen
+              navigation.replace('MainTabs'); // BottomTabNavigator with HomeScreen
               break;
             case 'artist':
               navigation.replace('ArtistHome');

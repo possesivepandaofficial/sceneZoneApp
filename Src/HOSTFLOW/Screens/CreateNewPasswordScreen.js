@@ -11,16 +11,18 @@ import {
   KeyboardAvoidingView,
   Modal,
   Image,
+  Alert,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Feather';
 import LinearGradient from 'react-native-linear-gradient';
 import SignUpBackground from '../assets/Banners/SignUp';
 import MailboxIcon from '../assets/icons/mailbox';
+import api from '../Config/api';
 
 const { width, height } = Dimensions.get('window');
 
-const CreateNewPasswordScreen = ({ navigation }) => {
+const CreateNewPasswordScreen = ({ navigation, route }) => {
   const insets = useSafeAreaInsets();
 
   const [password, setPassword] = useState('');
@@ -29,15 +31,44 @@ const CreateNewPasswordScreen = ({ navigation }) => {
   const [showPass2, setShowPass2] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  const handleResetPassword = () => {
-    // Show modal first
-    setShowSuccessModal(true);
+  // Get email from navigation params
+  const email = route?.params?.email || '';
 
-    // After delay, close modal and navigate
-    setTimeout(() => {
-      setShowSuccessModal(false);
-      navigation.navigate('Home'); // adjust target screen name
-    }, 2000);
+  const handleResetPassword = async () => {
+    if (!email) {
+      Alert.alert('Error', 'Email is missing.');
+      return;
+    }
+    if (!password || !confirmPassword) {
+      Alert.alert('Error', 'Please enter and confirm your new password.');
+      return;
+    }
+    if (password !== confirmPassword) {
+      Alert.alert('Error', 'Passwords do not match.');
+      return;
+    }
+    try {
+      const response = await api.post('/host/set-newpassword', {
+        email,
+        password,
+      });
+      if (response.data.success) {
+        setShowSuccessModal(true);
+        Alert.alert('Success', 'Password reset successfully!', [
+          {
+            text: 'OK',
+            onPress: () => {
+              setShowSuccessModal(false);
+              navigation.navigate('MainTabs');
+            }
+          }
+        ]);
+      } else {
+        Alert.alert('Error', response.data.message || 'Failed to reset password');
+      }
+    } catch (error) {
+      Alert.alert('Error', error.response?.data?.message || 'Failed to reset password');
+    }
   };
 
   return (
