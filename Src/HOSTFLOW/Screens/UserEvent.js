@@ -101,11 +101,15 @@ const UserEvent = ({ navigation }) => {
         <Text style={styles.sectionTitle}>Sound System Availability</Text>
         <View style={styles.soundSystemRow}>
           <TouchableOpacity style={[styles.checkboxPill, soundSystemAvailable && styles.checkboxPillActive]} onPress={() => setSoundSystemAvailable(true)}>
-            <Ionicons name={soundSystemAvailable ? 'checkbox' : 'square-outline'} size={22} color={soundSystemAvailable ? '#a95eff' : '#a95eff'} />
+            <View style={[styles.customCheckbox, soundSystemAvailable && styles.customCheckboxChecked]}>
+              {soundSystemAvailable && <Text style={styles.checkmark}>✓</Text>}
+            </View>
             <Text style={[styles.checkboxPillText, soundSystemAvailable && styles.checkboxPillTextActive]}>Yes</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.checkboxPill, !soundSystemAvailable && styles.checkboxPillActive]} onPress={() => setSoundSystemAvailable(false)}>
-            <Ionicons name={!soundSystemAvailable ? 'checkbox' : 'square-outline'} size={22} color={!soundSystemAvailable ? '#a95eff' : '#a95eff'} />
+            <View style={[styles.customCheckbox, !soundSystemAvailable && styles.customCheckboxCheckedNo]}>
+              {!soundSystemAvailable && <Text style={styles.checkmarkNo}></Text>}
+            </View>
             <Text style={[styles.checkboxPillText, !soundSystemAvailable && styles.checkboxPillTextActive]}>No</Text>
           </TouchableOpacity>
         </View>
@@ -115,24 +119,26 @@ const UserEvent = ({ navigation }) => {
         <Text style={styles.aboutText}>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur nec lorem a justo pulvinar suscipit.
         </Text>
-      </ScrollView>
-      {/* Fixed bottom buttons */}
-      <View style={styles.fixedBottomButtonsContainer}>
-        <View style={styles.heartButtonOuter}>
-          <TouchableOpacity style={styles.heartButton}>
-            <Ionicons name="heart-outline" size={32} color="#a95eff" />
-          </TouchableOpacity>
-        </View>
-        <TouchableOpacity style={styles.soldOutButton}>
+
+        {/* Heart and Sold Out Buttons (moved from fixed to scrollable) */}
+        <View style={styles.fixedBottomButtonsContainer}>
+          <View style={styles.heartButtonOuter}>
+            <TouchableOpacity style={styles.heartButton}>
+              <Ionicons name="heart-outline" size={32} color="#a95eff" />
+            </TouchableOpacity>
+          </View>
           <LinearGradient
-            colors={['#B15CDE', '#7952FC']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={StyleSheet.absoluteFill}
-          />
-          <Text style={styles.soldOutButtonText}>Sold Out</Text>
-        </TouchableOpacity>
-      </View>
+            colors={["#B15CDE", "#7952FC"]}
+            start={{ x: 1, y: 0 }}
+            end={{ x: 0, y: 0 }}
+            style={styles.soldOutButton}
+          >
+            <TouchableOpacity style={styles.soldOutButtonInner} onPress={() => navigation.navigate('UserFormBookingScreen', { eventDetails: { title: 'Sounds of Celebration', price: '$400-$500', location: 'Yogyakarta', image: require('../assets/Images/ffff.jpg') } })}>
+              <Text style={styles.soldOutButtonText}>Continue</Text>
+            </TouchableOpacity>
+          </LinearGradient>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -320,7 +326,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   categoryPill: {
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: '#b3b3cc',
     backgroundColor: 'transparent',
     borderRadius: 16,
@@ -329,7 +335,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: 10,
     paddingVertical: 6,
   },
   categoryPillText: {
@@ -390,27 +396,53 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 10,
   },
+  customCheckbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: '#a95eff',
+    backgroundColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+  },
+  customCheckboxChecked: {
+    backgroundColor: '#a95eff',
+  },
+  customCheckboxCheckedNo: {
+    backgroundColor: 'transparent',
+  },
+  checkmark: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    lineHeight: 20,
+  },
+  checkmarkNo: {
+    color: 'transparent',
+  },
   checkboxPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#a95eff',
+    borderWidth: 0,
+    borderColor: 'transparent',
     borderRadius: 10,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    marginRight: 18,
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+    marginRight: 24,
     backgroundColor: 'transparent',
   },
   checkboxPillActive: {
-    backgroundColor: 'rgba(169,94,255,0.08)',
-    borderColor: '#a95eff',
+    backgroundColor: 'transparent',
+    borderColor: 'transparent',
   },
   checkboxPillText: {
     color: '#C6C5ED',
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '500',
     fontFamily: 'Nunito Sans',
-    marginLeft: 6,
+    marginLeft: 2,
   },
   checkboxPillTextActive: {
     color: '#a95eff',
@@ -426,50 +458,42 @@ const styles = StyleSheet.create({
     fontFamily: 'Nunito Sans',
   },
   fixedBottomButtonsContainer: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 24,
-    paddingBottom: 24,
-    paddingTop: 12,
-    backgroundColor: 'rgba(24, 21, 31, 0.7)',
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
+    paddingBottom: 0,
+    paddingTop: 0,
+    backgroundColor: 'transparent',
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
     gap: 16,
+    marginTop: 24,
   },
-  heartButtonOuter: {
-    width: 72,
-    height: 72,
-    borderRadius: 24,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
-  },
+ 
   heartButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 18,
+    width: 48,
+    height: 48,
+    borderRadius: 16,
     backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#a95eff',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
-    elevation: 4,
+    shadowColor: 'transparent',
+    elevation: 0,
   },
   soldOutButton: {
-    flex: 1,
+    flex: 2,
     height: 56,
-    borderRadius: 18,
-    overflow: 'hidden',
+    borderRadius: 14,
+    borderWidth: 0,
+    borderColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 0,
+    marginRight: 0,
+    paddingHorizontal: 0,
+    shadowColor: 'transparent',
+    elevation: 0,
+    
   },
   soldOutButtonText: {
     color: '#fff',
@@ -478,6 +502,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     letterSpacing: 0.2,
     textAlign: 'center',
+  },
+  soldOutButtonInner: {
+    flex: 1,
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

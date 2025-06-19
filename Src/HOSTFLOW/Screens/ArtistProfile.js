@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, ImageBackground, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -13,6 +13,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import MaskedView from '@react-native-masked-view/masked-view';
+import ArtistBottomNavBar from '../Components/ArtistBottomNavBar';
 
 const { width } = Dimensions.get('window');
 
@@ -54,6 +55,7 @@ const design = {
 };
 
 const ArtistProfileScreen = ({ navigation }) => {
+  const [activeTab, setActiveTab] = useState('profile');
   const dispatch = useDispatch();
   const insets = useSafeAreaInsets();
 
@@ -157,6 +159,12 @@ const ArtistProfileScreen = ({ navigation }) => {
           <Text style={styles.logoutButtonText}>Log Out</Text>
         </TouchableOpacity>
       </ScrollView>
+      <ArtistBottomNavBar
+        navigation={navigation}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        insets={insets}
+      />
     </View>
   );
 };
@@ -185,10 +193,11 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: design.fontSize.header,
-    fontWeight: 'bold',
+    fontWeight: '600',
     color: '#fff',
     flex: 1,
     textAlign: 'center',
+    marginRight:260,
   },
   backButton: {
     padding: design.spacing.sm,

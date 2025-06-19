@@ -15,6 +15,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/Feather'; // For the ticket icon
 import LinearGradient from 'react-native-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Ticket from '../assets/icons/Ticket';
 
 const { width } = Dimensions.get('window');
 
@@ -110,19 +111,9 @@ const UserFormBookingScreen = ({ navigation, route }) => {
             style={[styles.guestTypeCard, selectedGuestType === 'level2' && styles.guestTypeCardSelected]}
             onPress={() => setSelectedGuestType('level2')}
           >
-            <LinearGradient
-              colors={selectedGuestType === 'level2' ? ['#B15CDE', '#7952FC'] : ['#1a1a1a', '#1a1a1a']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.guestTypeGradient}
-            />
             <View style={styles.guestTypeContent}>
               <View style={styles.guestTypeIconContainer}>
-                <Image
-                  source={require('../assets/Images/ticket.png')}
-                  style={styles.guestTypeIcon}
-                  resizeMode="contain"
-                />
+                <Ticket width={30} height={30} />
               </View>
               <View style={styles.guestTypeTextContainer}>
                 <View style={styles.guestTypeTitleContainer}>
@@ -137,7 +128,7 @@ const UserFormBookingScreen = ({ navigation, route }) => {
               </View>
               {selectedGuestType === 'level2' && (
                 <View style={styles.checkmarkContainer}>
-                  <Ionicons name="checkmark-circle" size={24} color="#fff" />
+                  <Ionicons name="checkmark-circle" size={24} color="#a95eff" />
                 </View>
               )}
             </View>
@@ -199,6 +190,7 @@ const styles = StyleSheet.create({
     fontStyle: 'normal',
     fontWeight: '700',
     lineHeight: 24,
+    marginRight:180,
   },
   eventCard: {
     flexDirection: 'row',
@@ -246,9 +238,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#fff',
+    color: '#7A7A90',
+    fontFamily: 'Nunito Sans',
+    fontSize: 12,
+    fontStyle: 'normal',
+    fontWeight: '400',
+    lineHeight: 18,
   },
   ticketInputContainer: {
     display: 'flex',
@@ -276,26 +271,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   guestTypeCard: {
-    borderRadius: 10,
+    borderRadius: 16,
     marginBottom: 10,
     overflow: 'hidden',
     position: 'relative',
-     borderWidth: 1,
+    borderWidth: 1,
     borderColor: '#333', // Default border color
+    backgroundColor: '#18151f', // Solid dark background
   },
   guestTypeCardSelected: {
     borderColor: '#a95eff', // Purple border when selected
-  },
-  guestTypeGradient: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    opacity: 0.7, // Adjust opacity of the gradient background
-  },
-  guestTypeIconContainer: {
-    marginRight: 15,
   },
   guestTypeContent: {
     flexDirection: 'row',
@@ -303,9 +288,8 @@ const styles = StyleSheet.create({
     padding: 15,
     zIndex: 1,
   },
-  guestTypeIcon: {
-    width: 30,
-    height: 30,
+  guestTypeIconContainer: {
+    marginRight: 15,
   },
   guestTypeTextContainer: {
     flex: 1,

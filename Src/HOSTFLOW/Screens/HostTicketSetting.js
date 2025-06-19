@@ -65,6 +65,17 @@ const CustomToggle = ({ value, onValueChange }) => (
       padding: 2,
     }}
   >
+    {value ? (
+      <LinearGradient
+        colors={['#B15CDE', '#7952FC']}
+        start={{ x: 0, y: 0.5 }}
+        end={{ x: 1, y: 0.5 }}
+        style={{
+          ...StyleSheet.absoluteFillObject,
+          borderRadius: 14,
+        }}
+      />
+    ) : null}
     <View
       style={{
         width: 20,
@@ -73,7 +84,7 @@ const CustomToggle = ({ value, onValueChange }) => (
         backgroundColor: '#C6C5ED',
         marginLeft: value ? 18 : 0,
         marginRight: value ? 0 : 18,
-        transition: 'margin 0.2s',
+        zIndex: 1,
       }}
     />
   </TouchableOpacity>
@@ -150,55 +161,62 @@ const HostTicketSettingScreen = ({ navigation }) => {
       >
         {/* Paid / RSVP Toggle */}
         <View style={styles.toggleContainer}>
-          <TouchableOpacity
-            style={[
-              styles.toggleButton,
-              ticketType === 'Paid' ? styles.toggleButtonActive : styles.toggleButtonInactive,
-              { borderTopRightRadius: 0, borderBottomRightRadius: 0 },
-            ]}
-            onPress={() => setTicketType('Paid')}
-            activeOpacity={0.85}
-          >
+          {/* Paid Button */}
+          {ticketType === 'Paid' ? (
             <LinearGradient
-              colors={ticketType === 'Paid' ? ['#B15CDE', '#7952FC'] : ['#181828', '#181828']}
+              colors={['#B15CDE', '#7952FC']}
               start={{ x: 0, y: 0.5 }}
               end={{ x: 1, y: 0.5 }}
-              style={styles.toggleButtonGradient}
+              style={[styles.toggleButton, styles.toggleButtonActive]}
             >
-              <Text style={[
-                styles.toggleButtonText,
-                ticketType === 'Paid' ? styles.toggleButtonTextActive : styles.toggleButtonTextInactive,
-              ]}>
-                Paid
-              </Text>
+              <TouchableOpacity
+                style={{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', borderRadius: 20 }}
+                onPress={() => setTicketType('Paid')}
+                activeOpacity={1}
+              >
+                <Text style={[styles.toggleButtonText, styles.toggleButtonTextActive]}>Paid</Text>
+              </TouchableOpacity>
             </LinearGradient>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.toggleButton,
-              ticketType === 'RSVP/Free' ? styles.toggleButtonActive : styles.toggleButtonInactive,
-              { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 },
-            ]}
-            onPress={() => setTicketType('RSVP/Free')}
-            activeOpacity={0.85}
-          >
+          ) : (
+            <View style={[styles.toggleButton, styles.toggleButtonInactive]}>
+              <TouchableOpacity
+                style={{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', borderRadius: 20 }}
+                onPress={() => setTicketType('Paid')}
+                activeOpacity={1}
+              >
+                <Text style={[styles.toggleButtonText, styles.toggleButtonTextInactive]}>Paid</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+          {/* RSVP/Free Button */}
+          {ticketType === 'RSVP/Free' ? (
             <LinearGradient
-              colors={ticketType === 'RSVP/Free' ? ['#B15CDE', '#7952FC'] : ['#181828', '#181828']}
+              colors={['#B15CDE', '#7952FC']}
               start={{ x: 0, y: 0.5 }}
               end={{ x: 1, y: 0.5 }}
-              style={styles.toggleButtonGradient}
+              style={[styles.toggleButton, styles.toggleButtonActive]}
             >
-              <Text style={[
-                styles.toggleButtonText,
-                ticketType === 'RSVP/Free' ? styles.toggleButtonTextActive : styles.toggleButtonTextInactive,
-              ]}>
-                RSVP/Free
-              </Text>
+              <TouchableOpacity
+                style={{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', borderRadius: 20 }}
+                onPress={() => setTicketType('RSVP/Free')}
+                activeOpacity={1}
+              >
+                <Text style={[styles.toggleButtonText, styles.toggleButtonTextActive]}>RSVP/Free</Text>
+              </TouchableOpacity>
             </LinearGradient>
-          </TouchableOpacity>
+          ) : (
+            <View style={[styles.toggleButton, styles.toggleButtonInactive]}>
+              <TouchableOpacity
+                style={{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', borderRadius: 20 }}
+                onPress={() => setTicketType('RSVP/Free')}
+                activeOpacity={1}
+              >
+                <Text style={[styles.toggleButtonText, styles.toggleButtonTextInactive]}>RSVP/Free</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
-
-        {/* Upload Event Poster */}
+        <View style={styles.dividerLineCustom} />
         <TouchableOpacity style={styles.uploadContainer} onPress={handleUploadPoster}>
           <Camera width={25} height={24} style={{ marginBottom: 4 }} />
           <Text style={styles.uploadText}>Upload Event Poster</Text>
@@ -248,10 +266,12 @@ const HostTicketSettingScreen = ({ navigation }) => {
             <Text style={styles.datePickerText}>{startDate || 'Start Date'}</Text>
           </TouchableOpacity>
           <Text style={styles.datePickerDivider}>-</Text>
-          <TouchableOpacity style={styles.datePickerButton} onPress={() => handleDateSelect('End Date')}>
-            <Text style={styles.datePickerText}>{endDate || 'End Date'}</Text>
-            <MaterialIcons name="calendar-today" size={Math.max(dimensions.iconSize * 0.8, 16)} color="#a95eff" style={styles.datePickerIcon} />
+          <TouchableOpacity style={styles.datePickerEndButton} onPress={() => handleDateSelect('End Date')}>
+            <Text style={[styles.datePickerText, { textAlign: 'right' }]}>{endDate || 'End Date'}</Text>
           </TouchableOpacity>
+          <View style={styles.datePickerIconWrapper}>
+            <MaterialIcons name="calendar-today" size={28} color="#B392FF" />
+          </View>
         </View>
 
         {/* Start and End Time */}
@@ -313,8 +333,8 @@ const HostTicketSettingScreen = ({ navigation }) => {
           </View>
         )}
 
-        {/* Ticket Status (only if Paid) */}
-        {ticketType === 'Paid' && (
+        {/* Ticket Status (show for both Paid and RSVP/Free) */}
+        {(ticketType === 'Paid' || ticketType === 'RSVP/Free') && (
           <View>
             <Text style={styles.label}>Ticket Status</Text>
             <View style={styles.ticketStatusContainer}>
@@ -412,34 +432,42 @@ const styles = StyleSheet.create({
   toggleContainer: {
     flexDirection: 'row',
     width: '100%',
-    borderRadius: 24,
+    borderRadius: 20,
     overflow: 'hidden',
     marginBottom: dimensions.spacing.xl,
     backgroundColor: 'transparent',
     borderWidth: 0,
     alignSelf: 'center',
+    gap: 12,
+    paddingHorizontal: 0,
   },
   toggleButton: {
     flex: 1,
-    height: 52,
-    paddingHorizontal: 16,
+    height: 56,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 14,
+    borderRadius: 20,
     alignSelf: 'stretch',
     flexDirection: 'row',
-    gap: 10,
     margin: 0,
     padding: 0,
+    shadowColor: 'rgba(177, 92, 222, 0.15)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    elevation: 4,
   },
   toggleButtonActive: {
-    shadowColor: 'transparent',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0,
-    shadowRadius: 0,
-    elevation: 0,
+    backgroundColor: 'transparent',
+    shadowColor: '#B15CDE',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 6,
   },
   toggleButtonInactive: {
+    backgroundColor: '#181828',
+    borderWidth: 0,
     shadowColor: 'transparent',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0,
@@ -452,13 +480,13 @@ const styles = StyleSheet.create({
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 24,
+    borderRadius: 20,
     paddingHorizontal: 0,
     paddingVertical: 0,
   },
   toggleButtonText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '700',
     fontFamily: 'Nunito Sans',
     textAlign: 'center',
     letterSpacing: 0.1,
@@ -470,9 +498,10 @@ const styles = StyleSheet.create({
     color: '#C6C5ED',
   },
   uploadContainer: {
+    marginTop:10,
     display: 'flex',
     flexDirection: 'row',
-    paddingVertical: 10,
+    paddingVertical: 6,
     paddingHorizontal: 20,
     justifyContent: 'center',
     alignItems: 'center',
@@ -487,7 +516,7 @@ const styles = StyleSheet.create({
     color: '#C6C5ED',
     textAlign: 'center',
     fontFamily: 'Poppins',
-    fontSize: 16,
+    fontSize: 14,
     fontStyle: 'normal',
     fontWeight: '300',
     lineHeight: undefined,
@@ -506,10 +535,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   label: {
-    fontSize: dimensions.fontSize.body,
-    color: '#d1cfff',
+    color: '#7A7A90',
+    fontFamily: 'Nunito Sans',
+    fontSize: 12,
+    fontStyle: 'normal',
+    fontWeight: '400',
+    lineHeight: 18,
     marginBottom: dimensions.spacing.sm,
-    fontWeight: '500',
   },
   input: {
     backgroundColor: '#121212',
@@ -543,23 +575,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    height: 48,
+    height: 60,
     paddingTop: 0,
-    paddingRight: 16,
+    paddingRight: 24,
     paddingBottom: 0,
-    paddingLeft: 48,
+    paddingLeft: 24,
     alignSelf: 'stretch',
-    borderRadius: 12,
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#8D6BFC',
-    backgroundColor: '#121212',
+    borderColor: '#B15CDE',
+    backgroundColor: 'transparent',
     marginBottom: dimensions.spacing.xl,
   },
   datePickerButton: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     backgroundColor: 'transparent',
     borderWidth: 0,
     paddingHorizontal: 0,
@@ -569,16 +601,37 @@ const styles = StyleSheet.create({
     marginRight: 0,
   },
   datePickerText: {
-    fontSize: dimensions.fontSize.title,
-    color: '#d1cfff',
+    fontSize: 13,
+    color: '#B392FF',
+    fontFamily: 'Nunito Sans',
+    fontWeight: '400',
+    textAlign: 'left',
+    flex: 1,
   },
   datePickerDivider: {
-    fontSize: Math.max(dimensions.fontSize.header, 24),
-    color: '#b3b3cc',
-    marginHorizontal: dimensions.spacing.xs,
+    fontSize: 32,
+    color: '#B392FF',
+    marginHorizontal: 0,
+    textAlign: 'center',
+    width: 30,
   },
-  datePickerIcon: {
-    marginLeft: dimensions.spacing.sm,
+  datePickerEndButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    backgroundColor: 'transparent',
+    borderWidth: 0,
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+    height: '100%',
+    minHeight: undefined,
+    marginLeft: 0,
+  },
+  datePickerIconWrapper: {
+    width: 40,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
   },
   timePickerRow: {
     flexDirection: 'row',
@@ -707,6 +760,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     alignSelf: 'stretch',
     marginBottom: dimensions.spacing.xl,
+  },
+  dividerLineCustom: {
+    width: 361,
+    height: 1,
+    backgroundColor: '#34344A',
+    alignSelf: 'center',
+    marginVertical: 18,
   },
 });
 

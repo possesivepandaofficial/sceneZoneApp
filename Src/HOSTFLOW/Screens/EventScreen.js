@@ -10,6 +10,7 @@ import {
   Dimensions,
   Alert,
   SafeAreaView,
+  Modal,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Feather from 'react-native-vector-icons/Feather';
@@ -18,6 +19,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import DeleteIcon from '../assets/icons/delete';
 import Calender from '../assets/icons/Calender';
 import RingIcon from '../assets/icons/ring';
+import { Calendar } from 'react-native-calendars';
+import RectangleSVG from '../assets/icons/rectangle';
 
 const { width, height } = Dimensions.get('window');
 
@@ -65,6 +68,7 @@ const initialEvents = [
     description:
       'Come along for an unforgettable evening filled with live music! Feel the beat and excitement!',
     image: require('../assets/Images/fff.jpg'),
+    status: 'Upcoming',
   },
   {
     id: '2',
@@ -74,6 +78,7 @@ const initialEvents = [
     tags: ['Pop', 'EDM'],
     description: 'Experience the electrifying energy of live performances under the stars!',
     image: require('../assets/Images/ffff.jpg'),
+    status: 'Recent',
   },
   {
     id: '3',
@@ -83,6 +88,7 @@ const initialEvents = [
     tags: ['House', 'Trance', 'Chill'],
     description: 'Dance into the sunset with the best DJs and a beach vibe you will never forget!',
     image: require('../assets/Images/fff.jpg'),
+    status: 'Upcoming',
   },
   {
     id: '4',
@@ -92,6 +98,7 @@ const initialEvents = [
     tags: ['Bollywood', 'Dance', 'Fusion'],
     description: 'A night of Bollywood hits and fusion performances to light up your evening!',
     image: require('../assets/Images/ffff.jpg'),
+    status: 'Upcoming',
   },
 ];
 
@@ -99,6 +106,7 @@ const EventScreen = ({ navigation }) => {
   const isDark = useColorScheme() === 'dark';
   const [events, setEvents] = useState(initialEvents);
   const insets = useSafeAreaInsets();
+  const [calendarVisible, setCalendarVisible] = useState(false);
 
   const textColor = '#fff'; // Force white text for visibility
   const subText = '#aaa'; // Light gray for secondary text
@@ -112,10 +120,51 @@ const EventScreen = ({ navigation }) => {
     <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}> 
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Events</Text>
-        <TouchableOpacity style={styles.headerIconButton}>
+        <TouchableOpacity style={styles.headerIconButton} onPress={() => setCalendarVisible(true)}>
           <Calender width={32} height={32} />
         </TouchableOpacity>
       </View>
+      <Modal
+        visible={calendarVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setCalendarVisible(false)}
+      >
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ backgroundColor: '#fff', borderRadius: 16, padding: 20, width: '90%' }}>
+            <Calendar
+              onDayPress={() => setCalendarVisible(false)}
+              theme={{
+                backgroundColor: '#fff',
+                calendarBackground: '#fff',
+                textSectionTitleColor: '#b6c1cd',
+                selectedDayBackgroundColor: '#B15CDE',
+                selectedDayTextColor: '#fff',
+                todayTextColor: '#B15CDE',
+                dayTextColor: '#2d4150',
+                textDisabledColor: '#d9e1e8',
+                dotColor: '#B15CDE',
+                selectedDotColor: '#fff',
+                arrowColor: '#B15CDE',
+                monthTextColor: '#7952FC',
+                indicatorColor: '#7952FC',
+                textDayFontFamily: 'Nunito Sans',
+                textMonthFontFamily: 'Nunito Sans',
+                textDayHeaderFontFamily: 'Nunito Sans',
+                textDayFontWeight: '400',
+                textMonthFontWeight: '700',
+                textDayHeaderFontWeight: '400',
+                textDayFontSize: 16,
+                textMonthFontSize: 18,
+                textDayHeaderFontSize: 12,
+              }}
+            />
+            <TouchableOpacity onPress={() => setCalendarVisible(false)} style={{ marginTop: 16, alignSelf: 'center' }}>
+              <Text style={{ color: '#B15CDE', fontWeight: '700', fontSize: 16 }}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
       <LinearGradient
         colors={['rgba(252,252,253,0.04)', 'rgba(252,252,253,0.03)']}
         start={{ x: 0.13, y: 0 }}
@@ -143,8 +192,9 @@ const EventScreen = ({ navigation }) => {
                     <Text style={styles.dateText}>{event.date.month}</Text>
                     <Text style={styles.dateDay}>{event.date.day}</Text>
                   </View>
-                  <View style={styles.statusTag}>
-                    <Text style={styles.statusText}>Upcoming</Text>
+                  <View style={styles.upcomingContainer}>
+                    <RectangleSVG />
+                    <Text style={styles.upcomingText}>{event.status || 'Upcoming'}</Text>
                   </View>
                 </View>
 
@@ -329,21 +379,33 @@ const styles = StyleSheet.create({
     fontWeight: 'bold', 
     fontSize: dimensions.fontSize.body,
   },
-  statusTag: {
+  upcomingContainer: {
     position: 'absolute',
-    bottom: dimensions.spacing.md,
-    left: dimensions.spacing.md,
-    backgroundColor: '#a95eff',
-    paddingHorizontal: dimensions.spacing.md,
-    paddingVertical: dimensions.spacing.xs,
-    borderRadius: dimensions.borderRadius.sm,
-    minHeight: 28,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 17,
+    width: 127,
+    alignSelf: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
+    alignContent: 'center',
+    zIndex: 2,
+    marginBottom: 0,
+    marginLeft:90,
   },
-  statusText: { 
-    color: '#fff', 
-    fontSize: dimensions.fontSize.small,
-    fontWeight: '500',
+  upcomingText: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    textAlign: 'center',
+    color: '#C6C5ED',
+    fontFamily: 'Nunito Sans',
+    fontSize: 10,
+    fontWeight: '400',
+    lineHeight: 17,
+    letterSpacing: 0.2,
+    zIndex: 3,
   },
   cardContent: { 
     padding: dimensions.cardPadding,

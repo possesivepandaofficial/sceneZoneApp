@@ -102,7 +102,7 @@ const UserOtpVerificationScreen = ({ navigation }) => {
   };
 
   const handleVerify = () => {
-    navigation.navigate('UserCreateProfile');
+    navigation.navigate('UserVerifiedScreen');
   };
 
   return (

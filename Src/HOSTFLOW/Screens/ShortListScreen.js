@@ -17,6 +17,8 @@ import LinearGradient from 'react-native-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FluentIcon from '../assets/icons/fluent';
 import MaskedView from '@react-native-masked-view/masked-view';
+import Tapicon from '../assets/icons/Tapicon';
+import BlackRectangle from '../assets/icons/BlackRectangle';
 
 const { width, height } = Dimensions.get('window');
 
@@ -200,6 +202,15 @@ const ShortlistScreen = ({ navigation }) => {
         activeOpacity={0.8}
       >
         <View style={styles.imageContainer}>
+          {/* BlackRectangle SVG at top center with overlay text */}
+          <View style={styles.crowdGuaranteeContainer}>
+            <BlackRectangle />
+            <Text style={styles.crowdGuaranteeText}>Crowd Guarantee</Text>
+          </View>
+          {/* Tapicon at top right over the image */}
+          <View style={{ position: 'absolute', top: 12, right: 12, zIndex: 10 }}>
+            <Tapicon width={32} height={32} />
+          </View>
           <Image
             source={item.image}
             style={styles.eventImage}
@@ -231,37 +242,44 @@ const ShortlistScreen = ({ navigation }) => {
 
   // Render the Manage Event card (for Manage Event tab)
   const renderManageEventCard = () => (
-    <View style={styles.manageEventCardContainer}>
-      <View style={styles.manageEventImageWrapper}>
-        <Image
-          source={require('../assets/Images/fff.jpg')}
-          style={styles.manageEventImage}
-          resizeMode="cover"
-        />
-        <View style={styles.manageEventDateBadge}>
-          <Text style={styles.manageEventDateMonth}>May</Text>
-          <Text style={styles.manageEventDateDay}>20</Text>
+    <LinearGradient
+      colors={['rgba(252, 252, 253, 0.04)', 'rgba(252, 252, 253, 0.03)']}
+      start={{ x: 0.13, y: 0 }}
+      end={{ x: 0.98, y: 1 }}
+      style={styles.manageEventCardContainer}
+    >
+      <View style={{ flex: 1, width: '100%' }}>
+        <View style={styles.manageEventImageWrapper}>
+          <Image
+            source={require('../assets/Images/fff.jpg')}
+            style={styles.manageEventImage}
+            resizeMode="cover"
+          />
+          <View style={styles.manageEventDateBadge}>
+            <Text style={styles.manageEventDateMonth}>May</Text>
+            <Text style={styles.manageEventDateDay}>20</Text>
+          </View>
+        </View>
+        <Text style={styles.manageEventTitle}>Sounds of Celebration</Text>
+        <View style={styles.manageEventButtonRow}>
+          <LinearGradient
+            colors={["#B15CDE", "#7952FC"]}
+            start={{ x: 1, y: 0 }}
+            end={{ x: 0, y: 0 }}
+            style={styles.manageEventButtonPurple}
+          >
+            <TouchableOpacity onPress={()=>navigation.navigate('HostManageEvent')}
+              style={{ width: '100%', alignItems: 'center', justifyContent: 'center' }}
+            >
+              <Text style={styles.manageEventButtonTextWhite}>Manage Event</Text>
+            </TouchableOpacity>
+          </LinearGradient>
+          <TouchableOpacity style={styles.manageEventTrashButton}>
+            <Feather name="trash-2" size={dimensions.iconSize} color="#a95eff" />
+          </TouchableOpacity>
         </View>
       </View>
-      <Text style={styles.manageEventTitle}>Sounds of Celebration</Text>
-      <View style={styles.manageEventButtonRow}>
-        <LinearGradient
-          colors={["#B15CDE", "#7952FC"]}
-          start={{ x: 1, y: 0 }}
-          end={{ x: 0, y: 0 }}
-          style={styles.manageEventButtonPurple}
-        >
-          <TouchableOpacity onPress={()=>navigation.navigate('HostManageEvent')}
-            style={{ width: '100%', alignItems: 'center', justifyContent: 'center' }}
-          >
-            <Text style={styles.manageEventButtonTextWhite}>Manage Event</Text>
-          </TouchableOpacity>
-        </LinearGradient>
-        <TouchableOpacity style={styles.manageEventTrashButton}>
-          <Feather name="trash-2" size={dimensions.iconSize} color="#a95eff" />
-        </TouchableOpacity>
-      </View>
-    </View>
+    </LinearGradient>
   );
 
   return (
@@ -375,16 +393,10 @@ const ShortlistScreen = ({ navigation }) => {
           >
             {/* Close Button */}
             <TouchableOpacity
-              style={[
-                styles.modalCloseButton,
-                {
-                  top: dimensions.spacing.lg,
-                  right: Math.max(responsiveDimensions.safeAreaRight + dimensions.spacing.lg, dimensions.spacing.lg),
-                }
-              ]}
+              style={styles.modalCloseButtonEdge}
               onPress={() => setAddOptionsModalVisible(false)}
             >
-              <Feather name="x" size={dimensions.iconSize} color="#fff" />
+              <Feather name="x" size={dimensions.iconSize} color="#B15CDE" />
             </TouchableOpacity>
 
             {/* Buttons */}
@@ -487,16 +499,10 @@ const ShortlistScreen = ({ navigation }) => {
           >
             {/* Close Button */}
             <TouchableOpacity
-              style={[
-                styles.addToExistingModalCloseButton,
-                {
-                  top: Math.max(responsiveDimensions.safeAreaTop + dimensions.spacing.md, dimensions.spacing.md),
-                  right: Math.max(responsiveDimensions.safeAreaRight + dimensions.spacing.md, dimensions.spacing.md),
-                }
-              ]}
+              style={styles.modalCloseButtonEdge}
               onPress={() => setAddToExistingEventsModalVisible(false)}
             >
-              <Feather name="x" size={dimensions.iconSize} color="#000" />
+              <Feather name="x" size={dimensions.iconSize} color="#B15CDE" />
             </TouchableOpacity>
             {/* Event List */}
             <ScrollView 
@@ -515,47 +521,11 @@ const ShortlistScreen = ({ navigation }) => {
                   <View style={styles.existingEventDetails}>
                     <Text style={styles.existingEventTitle}>Sounds of Celebration</Text>
                     <Text style={styles.existingEventDescription}>Join us for an unforgettable evening filled with live music! Feel the beat and excitement!</Text>
-                    <MaskedView
-                      maskElement={
-                        <Text
-                          style={{
-                            fontFamily: 'Nunito Sans',
-                            fontSize: 10,
-                            fontStyle: 'normal',
-                            fontWeight: '400',
-                            lineHeight: 10,
-                            textAlign: 'center',
-                            backgroundColor: 'transparent',
-                           paddingRight:80,
-                          }}
-                          numberOfLines={1}
-                          ellipsizeMode="tail"
-                        >
-                          May 20 | 08:30PM
-                        </Text>
-                      }
-                    >
-                      <LinearGradient
-                        colors={['#B15CDE', '#7952FC']}
-                        start={{ x: 1, y: 0 }}
-                        end={{ x: 0, y: 1 }}
-                        style={{ height: 21 }}
-                      >
-                        <Text
-                          style={{
-                            opacity: 0,
-                            fontFamily: 'Nunito Sans',
-                            fontSize: 10,
-                            fontStyle: 'normal',
-                            fontWeight: '400',
-                            lineHeight: 21,
-                            textAlign: 'center',
-                          }}
-                        >
-                          May 20 | 08:30PM
-                        </Text>
-                      </LinearGradient>
-                    </MaskedView>
+                    <View style={styles.dateTimeBox}>
+                      <Text style={styles.dateTextBox}>May 20</Text>
+                      <View style={styles.dateTimeDivider} />
+                      <Text style={styles.timeTextBox}>08:30PM</Text>
+                    </View>
                   </View>
                 </View>
               ))}
@@ -600,10 +570,11 @@ const styles = StyleSheet.create({
     gap: 0, // Remove gap for manual spacing
   },
   tab: {
+    
     flex: 1,
     height: 52,
     paddingVertical: 0,
-    paddingHorizontal: 16,
+    paddingHorizontal: 0,
     borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
@@ -622,7 +593,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 52,
     paddingVertical: 0,
-    paddingHorizontal: 16,
+    paddingHorizontal: 14,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 14,
@@ -668,7 +639,7 @@ const styles = StyleSheet.create({
     bottom: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
     paddingHorizontal: 16,
     gap: 8,
   },
@@ -708,9 +679,10 @@ const styles = StyleSheet.create({
   },
   manageEventCardContainer: {
     display: 'flex',
-    width: 320,
+    height: 260,
+    width: '96%',
     minWidth: 200,
-    maxWidth: 400,
+    maxWidth: 440,
     padding: 12,
     alignItems: 'flex-start',
     alignContent: 'flex-start',
@@ -719,7 +691,6 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     borderWidth: 1,
     borderColor: 'rgba(252, 252, 253, 0.12)',
-    backgroundColor: 'transparent',
     overflow: 'hidden',
     shadowColor: '#0F0F0F',
     shadowOffset: { width: 0, height: 20 },
@@ -727,6 +698,7 @@ const styles = StyleSheet.create({
     shadowRadius: 32,
     elevation: 6,
     marginTop: 0,
+    alignSelf: 'center',
   },
   manageEventImageWrapper: {
     width: '100%',
@@ -837,16 +809,26 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     maxWidth: '100%',
     marginHorizontal: 0,
+    overflow: 'visible',
   },
-  modalCloseButton: {
+  modalCloseButtonEdge: {
     position: 'absolute',
-    backgroundColor: '#a95eff',
-    borderRadius: dimensions.borderRadius.xl,
-    width: Math.max(width * 0.1, 40),
-    height: Math.max(width * 0.1, 40),
+    top: -28,
+    right: -28,
+    width: 42,
+    height:42,
+    borderRadius: 28,
+    backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 1,
+    zIndex: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 8,
+    marginRight:40,
+    marginTop:7
   },
   modalButton: {
     width: '95%',
@@ -859,6 +841,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderColor: '#FFF',
     borderWidth: 1,
+    
   },
   modalButtonWhite: {
     backgroundColor: '#fff',
@@ -945,9 +928,10 @@ const styles = StyleSheet.create({
     flex: 1,
     borderTopLeftRadius: dimensions.borderRadius.xl,
     borderTopRightRadius: dimensions.borderRadius.xl,
-    overflow: 'hidden',
+    overflow: 'visible',
     marginHorizontal: 0,
-    paddingTop: Math.max(height * 0.08, 60),
+    paddingTop: 0,
+    marginTop: 0,
     position: 'relative',
     minHeight: Math.max(height * 0.5, 400),
   },
@@ -1040,6 +1024,70 @@ const styles = StyleSheet.create({
     elevation: 4,
     backgroundColor: '#121212',
     marginBottom: 0,
+  },
+  crowdGuaranteeContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 18,
+    width: 128,
+    alignSelf: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 11,
+    marginTop: 0,
+    marginLeft:100,
+  },
+  crowdGuaranteeText: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    textAlign: 'center',
+    color: '#B15CDE',
+    fontFamily: 'Nunito Sans',
+    fontSize: 10,
+    fontWeight: '600',
+    lineHeight: 18,
+    letterSpacing: 0.2,
+    zIndex: 12,
+  },
+  dateTimeBox: {
+    display: 'flex',
+    flexDirection: 'row',
+    width: 115,
+    height: 24,
+    paddingTop: 0,
+    paddingBottom: 0,
+    paddingLeft: 12,
+    paddingRight: 18,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#7952FC',
+    marginBottom: 6,
+  },
+  dateTextBox: {
+    color: '#7952FC',
+    fontFamily: 'Nunito Sans',
+    fontSize: 10,
+    fontWeight: '500',
+  },
+  timeTextBox: {
+    color: '#7952FC',
+    fontFamily: 'Nunito Sans',
+    fontSize: 10,
+    fontWeight: '500',
+  },
+  dateTimeDivider: {
+    width: 16,
+    height: 0,
+    borderBottomWidth: 1,
+    borderColor: '#D0C1FF',
+    transform: [{ rotate: '90deg' }],
+    flexShrink: 0,
+    marginHorizontal: 2,
   },
 });
 

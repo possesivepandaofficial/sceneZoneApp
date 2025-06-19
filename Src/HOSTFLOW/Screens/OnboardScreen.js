@@ -64,7 +64,7 @@ const OnboardingScreen = ({ navigation }) => {
       resizeMode="cover"
     >
       <LinearGradient
-        colors={['rgba(0,0,0,0.5)', 'rgba(0,0,0,0.85)', '#000']}
+        colors={['rgba(0,0,0,0.15)', 'rgba(0,0,0,0.45)', '#000']}
         locations={[0.18, 0.55, 1]}
         style={styles.gradient}
       >
@@ -298,8 +298,10 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: 30,
     marginBottom: 50,
+    paddingTop: 620,
   },
   title: {
+    
     fontFamily: 'Nunito Sans',
     fontWeight: '800',
     fontSize: 30,
@@ -339,7 +341,8 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     borderRadius: 14,
     overflow: 'hidden',
-    marginBottom: 12,
+    marginTop: 24,
+
   },
   buttonGradient: {
     flex: 1,
@@ -352,6 +355,7 @@ const styles = StyleSheet.create({
   buttonContent: {
     flexDirection: 'row',
     alignItems: 'center',
+    
   },
   buttonText: {
     fontFamily: 'Nunito Sans',
@@ -382,11 +386,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#ccc',
     fontSize: 12,
-    marginTop: 0,
+    marginTop: 24,
   },
   signinBold: {
     fontWeight: 'bold',
     color: '#fff',
+    marginTop:24,
   },
   logoContainer: {
     alignItems: 'center',
@@ -395,11 +400,13 @@ const styles = StyleSheet.create({
     marginBottom: 150,
   },
   discoverButton: {
+    
     backgroundColor: 'black',
     borderWidth: 1,
     borderColor: '#B15CDE',
     width: '105%',
     alignSelf: 'center',
+    
   },
   discoverButtonContent: {
     flexDirection: 'row',

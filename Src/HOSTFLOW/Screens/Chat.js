@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, TextInput, FlatList, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import frame1 from '../assets/Images/frame1.png';
+import SendIcon from '../assets/icons/Send';
 
 const messages = [
   {
@@ -60,23 +61,27 @@ const ChatScreen = ({ navigation }) => {
       />
 
       <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.textInput}
-          placeholder="₹5000"
-          placeholderTextColor="#aaa"
-          keyboardType="numeric"
-          value={inputText}
-          onChangeText={(text) => {
-            // Allow only digits and limit to 5 characters
-            const numericInput = text.replace(/[^0-9]/g, ''); // Remove non-numeric characters
-            if (numericInput.length <= 5) {
-              setInputText(numericInput);
-            }
-          }}
-        />
-        {/* Add send button here if needed */}
+        <View style={styles.inputBoxWrapper}>
+          <TextInput
+            style={[styles.textInput, { paddingRight: 48 }]}
+            placeholder="₹5000"
+            placeholderTextColor="#aaa"
+            keyboardType="numeric"
+            value={inputText}
+            onChangeText={(text) => {
+              // Allow only digits and limit to 5 characters
+              const numericInput = text.replace(/[^0-9]/g, ''); // Remove non-numeric characters
+              if (numericInput.length <= 5) {
+                setInputText(numericInput);
+              }
+            }}
+          />
+          <TouchableOpacity style={styles.sendIconButton}>
+            <SendIcon width={26} height={26} />
+          </TouchableOpacity>
+        </View>
       </View>
-       <Text style={styles.numericInputHint}>Numeric Inputs Only</Text>
+      <Text style={styles.numericInputHint}>Numeric Inputs Only</Text>
     </SafeAreaView>
   );
 };
@@ -84,7 +89,7 @@ const ChatScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#121212',
   },
   header: {
     paddingTop:40,
@@ -162,25 +167,54 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingVertical: 12,
     borderTopWidth: 1,
     borderTopColor: '#333',
+    backgroundColor: '#121212',
+    marginBottom: 4,
+  },
+  inputBoxWrapper: {
+    flex: 1,
+    position: 'relative',
+    backgroundColor: '#1A1A1F',
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: '#121212',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 2,
+    minHeight: 48,
+    justifyContent: 'center',
   },
   textInput: {
     flex: 1,
-    backgroundColor: '#1a1a1a',
-    borderRadius: 20,
-    paddingVertical: 10,
+    backgroundColor: 'transparent',
+    borderRadius: 24,
+    paddingVertical: 12,
     paddingHorizontal: 16,
     color: '#fff',
     fontSize: 16,
   },
-    numericInputHint: {
+  numericInputHint: {
     color: '#aaa',
     fontSize: 12,
     textAlign: 'center',
     marginBottom: 18,
-   },
+  },
+  sendIconButton: {
+    position: 'absolute',
+    right: 12,
+    top: '50%',
+    transform: [{ translateY: -13 }], // half the icon height (26/2)
+    zIndex: 2,
+    backgroundColor: 'transparent',
+    borderRadius: 0,
+    padding: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
 
 export default ChatScreen; 

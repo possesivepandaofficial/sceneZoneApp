@@ -23,13 +23,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MiddleButton from '../assets/icons/MiddleButton';
 import NotificationIcon from '../assets/icons/NotificationIcon';
 import SignUpBackground from '../assets/Banners/SignUp';
+import Tapicon from '../assets/icons/Tapicon';
 
 const { width, height } = Dimensions.get('window');
 const isBigScreen = width >= 600;
 
 // Even bigger card for big screens
 const cardWidth = isBigScreen ? Math.min(width * 0.7, 520) : Math.min(width * 0.85, 235);
-const cardHeight = isBigScreen ? Math.round(cardWidth * 1.7) : 540;
+const cardHeight = isBigScreen ? Math.round(cardWidth * 1.2) : 480;
 const buttonHeight = isBigScreen ? 60 : 52;
 
 // All fixed values for pixel-perfect design
@@ -144,7 +145,7 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const renderPills = (section) => (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingLeft: 0, paddingRight: 0 }}>
       {filterOptions[section].map((option) => (
         <TouchableOpacity
           key={option}
@@ -261,9 +262,13 @@ const HomeScreen = ({ navigation }) => {
           transform: [{ scale }], 
           opacity,
           width: dimensions.cardWidth,
-          height: 540,
+          height: dimensions.cardHeight,
         }
       ]}>
+        {/* Tapicon above the card */}
+        <View style={{ position: 'absolute', top: 12, right: 12, zIndex: 10 }}>
+          <Tapicon width={32} height={32} />
+        </View>
         <TouchableOpacity onPress={() => navigation.navigate('HostPerfomanceDetails')} style={styles.eventCardTouchable}>
           <View style={styles.videoContainer}>
             <Video
@@ -502,7 +507,7 @@ const HomeScreen = ({ navigation }) => {
       <View style={[
         styles.middleIconsContainer,
         {
-          marginTop: Math.max(dimensions.spacing.xl + 20, 40), // Increased margin to shift buttons down
+          marginTop: Math.max(dimensions.spacing.xl + 50, 40), // Increased margin to shift buttons down
           marginBottom: Math.max(dimensions.spacing.lg + 60, 90), // Increased from 80 to 100 and 110 to 130
           paddingBottom: Math.max(dimensions.spacing.md, 10),
           paddingHorizontal: Math.max(dimensions.spacing.md, dimensions.spacing.md),
@@ -618,7 +623,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
     backgroundColor: '#000',
     width: dimensions.cardWidth,
-    height: 540,
+    height: dimensions.cardHeight,
     flexShrink: 0,
   },
   eventCardTouchable: {

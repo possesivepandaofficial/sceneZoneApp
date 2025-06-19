@@ -1,54 +1,58 @@
 import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
-import Icon from 'react-native-vector-icons/Feather';
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-const ArtistGeneralSettingsScreen = ({ navigation }) => {
+const HostGeneralSettingsScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
+      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Icon name="arrow-left" size={24} color="#fff" />
+          <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>General Settings</Text>
+        <View style={{ width: 24 }} />{/* Spacer to center the title */}
       </View>
-      <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollViewContent}>
-        {/* Placeholder Settings Options */}
-        <TouchableOpacity style={styles.optionItem}>
-          <Ionicons name="notifications-outline" size={24} color="#a95eff" style={styles.optionIcon} />
-          <Text style={styles.optionText}>Notification Settings</Text>
-          <Icon name="chevron-right" size={20} color="#aaa" />
+
+      <ScrollView contentContainerStyle={styles.scrollViewContent}>
+        {/* Language Setting */}
+        <TouchableOpacity style={styles.menuItem}>
+          <Text style={styles.menuItemText}>Language Setting</Text>
+          <Text style={styles.menuItemValue}>English</Text>
+          <MaterialIcons name="chevron-right" size={24} color="#555" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.optionItem}>
-          <Ionicons name="shield-checkmark-outline" size={24} color="#a95eff" style={styles.optionIcon} />
-          <Text style={styles.optionText}>Privacy Policy</Text>
-          <Icon name="chevron-right" size={20} color="#aaa" />
+        {/* Notification Setting */}
+        <TouchableOpacity style={styles.menuItem}>
+          <Text style={styles.menuItemText}>Notification Setting</Text>
+          <MaterialIcons name="chevron-right" size={24} color="#555" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.optionItem}>
-          <Ionicons name="document-text-outline" size={24} color="#a95eff" style={styles.optionIcon} />
-          <Text style={styles.optionText}>Terms of Service</Text>
-          <Icon name="chevron-right" size={20} color="#aaa" />
+        {/* About EVNC */}
+         <TouchableOpacity style={styles.menuItem}>
+          <Text style={styles.menuItemText}>About EVNC</Text>
+          <Text style={styles.menuItemValue}>Version 1.0.0.1</Text>
+          <MaterialIcons name="chevron-right" size={24} color="#555" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.optionItem}>
-          <MaterialIcons name="rate-review" size={24} color="#a95eff" style={styles.optionIcon} />
-          <Text style={styles.optionText}>Rate Us</Text>
-          <Icon name="chevron-right" size={20} color="#aaa" />
+        {/* Term of Use */}
+         <TouchableOpacity style={styles.menuItem}>
+          <Text style={styles.menuItemText}>Term of Use</Text>
+          <MaterialIcons name="chevron-right" size={24} color="#555" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.optionItem}>
-          <Ionicons name="share-social-outline" size={24} color="#a95eff" style={styles.optionIcon} />
-          <Text style={styles.optionText}>Share App</Text>
-          <Icon name="chevron-right" size={20} color="#aaa" />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.optionItem}>
-          <Ionicons name="information-circle-outline" size={24} color="#a95eff" style={styles.optionIcon} />
-          <Text style={styles.optionText}>About Us</Text>
-          <Icon name="chevron-right" size={20} color="#aaa" />
+         {/* Privacy Policy */}
+         <TouchableOpacity style={styles.menuItem}>
+          <Text style={styles.menuItemText}>Privacy Policy</Text>
+          <MaterialIcons name="chevron-right" size={24} color="#555" />
         </TouchableOpacity>
 
       </ScrollView>
@@ -59,43 +63,62 @@ const ArtistGeneralSettingsScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#121212',
   },
   header: {
-    paddingTop:40,
-    flexDirection: 'row',
-    alignItems: 'center',
+    display: 'flex',
+    width: 393,
+    paddingVertical: 20,
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 16,
+    backgroundColor: '#121212',
     borderBottomWidth: 1,
-    borderBottomColor: '#333',
+    borderBottomColor: '#C6C5ED',
+    // Shadow for iOS
+    shadowColor: 'rgba(104, 59, 252, 0.05)',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    // Elevation for Android
+    elevation: 8,
+    paddingTop:40,
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#fff',
-    marginLeft: 16,
   },
-  scrollViewContent: {
-    paddingVertical: 10,
+   scrollViewContent: {
+    paddingHorizontal: 16,
+    paddingTop: 20,
+    paddingBottom: 20,
   },
-  optionItem: {
+  menuItem: {
+    display: 'flex',
     flexDirection: 'row',
+    paddingVertical: 18,
+    paddingHorizontal: 16,
+    justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#1a1a1a',
-    borderRadius: 10,
-    marginHorizontal: 16,
+    alignSelf: 'stretch',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#34344A',
+    backgroundColor: '#1A1A1F',
     marginBottom: 10,
-    padding: 16,
   },
-  optionIcon: {
-    marginRight: 16,
-  },
-  optionText: {
-    flex: 1,
+  menuItemText: {
+    flex: 1, // Take up available space
     fontSize: 16,
     color: '#fff',
   },
+  menuItemValue: {
+      fontSize: 16,
+      color: '#a95eff', // Purple color for values
+      marginRight: 10,
+  },
 });
 
-export default ArtistGeneralSettingsScreen; 
+export default HostGeneralSettingsScreen; 

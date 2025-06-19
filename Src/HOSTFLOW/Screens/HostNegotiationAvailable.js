@@ -10,6 +10,7 @@ import {
   TextInput,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
+import SendIcon from '../assets/icons/Send';
 
 const HostNegotiationAvailableScreen = ({ navigation }) => {
   const [price, setPrice] = useState('');
@@ -68,6 +69,9 @@ const HostNegotiationAvailableScreen = ({ navigation }) => {
             placeholder="5000"
             placeholderTextColor="#666"
           />
+          <TouchableOpacity style={styles.sendButton}>
+            <SendIcon />
+          </TouchableOpacity>
         </View>
       </View>
     </SafeAreaView>
@@ -188,6 +192,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#fff',
     paddingVertical: 0, // Remove default vertical padding
+  },
+  sendButton: {
+    marginLeft: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

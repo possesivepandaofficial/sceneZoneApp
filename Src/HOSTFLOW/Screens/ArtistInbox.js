@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, FlatList, TextInput, Image, Switch } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import ArtistBottomNavBar from '../Components/ArtistBottomNavBar';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import CustomToggle from '../Components/CustomToggle';
 
 const messagesData = [
   {
@@ -52,6 +55,8 @@ const messagesData = [
 const ArtistInboxScreen = ({ navigation }) => {
   const [searchText, setSearchText] = useState('');
   const [isNegotiationEnabled, setIsNegotiationEnabled] = useState(false);
+  const [activeTab, setActiveTab] = useState('inbox');
+  const insets = useSafeAreaInsets();
 
   const renderMessageItem = ({ item }) => (
     <TouchableOpacity style={styles.messageCard} onPress={() => navigation.navigate('Chat')}>
@@ -73,21 +78,15 @@ const ArtistInboxScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Icon name="arrow-left" size={24} color="#fff" />
-        </TouchableOpacity>
         <Text style={styles.headerTitle}>Messages</Text>
         <View style={{ width: 24 }} />{/* Spacer */}
       </View>
 
       <View style={styles.negotiationToggleContainer}>
         <Text style={styles.negotiationToggleText}>Enable Negotiation</Text>
-        <Switch
-          trackColor={{ false: '#C6C5ED', true: '#C6C5ED' }}
-          thumbColor={'#18171D'}
-          ios_backgroundColor="#C6C5ED"
-          onValueChange={setIsNegotiationEnabled}
+        <CustomToggle
           value={isNegotiationEnabled}
+          onValueChange={setIsNegotiationEnabled}
         />
       </View>
 
@@ -109,6 +108,12 @@ const ArtistInboxScreen = ({ navigation }) => {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
       />
+      <ArtistBottomNavBar
+        navigation={navigation}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        insets={insets}
+      />
     </SafeAreaView>
   );
 };
@@ -129,9 +134,12 @@ const styles = StyleSheet.create({
     borderBottomColor: '#333',
   },
   headerTitle: {
+    fontFamily: 'Nunito Sans',
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontStyle: 'normal',
+    fontWeight: '700',
+    lineHeight: 24,
+    color: '#C6C5ED',
   },
   negotiationToggleContainer: {
     flexDirection: 'row',
@@ -141,9 +149,11 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   negotiationToggleText: {
-    fontSize: 15,
-    fontWeight:600,
-    color: '#fff',
+    fontSize: 14,
+    fontWeight:700,
+    color: '#C6C5ED',
+    fontFamily:'Nunito Sans',
+    fontStyle:'normal',
   },
   searchContainer: {
     display: 'flex',

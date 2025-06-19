@@ -24,6 +24,8 @@ import AppliedIcon from '../assets/icons/Applied';
 import InboxIcon from '../assets/icons/inbox';
 import SignUpBackground from '../assets/Banners/SignUp';
 import MaskedView from '@react-native-masked-view/masked-view';
+import CustomToggle from '../Components/CustomToggle'; // Adjust path as needed
+import ArtistBottomNavBar from '../Components/ArtistBottomNavBar';
 
 const { width } = Dimensions.get('window');
 
@@ -163,12 +165,14 @@ const ArtistEventCard = ({ item, navigation }) => {
          <Ionicons name="heart-outline" size={24} color="#fff" />
        </TouchableOpacity>
       <View style={styles.eventContent}>
-        <Text style={styles.eventLocation}>{item.location}</Text>
         <View style={styles.eventDetailsRow}>
-          <Text style={styles.eventBudget}>{item.budget}</Text>
-          <Text style={styles.eventTime}>{item.time}</Text>
-        </View>
-         <View style={styles.starRating}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.eventLocation}>{item.location}</Text>
+            <Text style={styles.eventBudget}>{item.budget}</Text>
+          </View>
+          <View style={styles.eventTimeAndRating}>
+            <Text style={styles.eventTime}>{item.time}</Text>
+            <View style={styles.starRating}>
               {[...Array(5)].map((_, i) => (
                 <Icon
                   key={i}
@@ -179,6 +183,8 @@ const ArtistEventCard = ({ item, navigation }) => {
                 />
               ))}
             </View>
+          </View>
+        </View>
         <View style={styles.tagsContainer}>
           {item.tags.map((tag, index) => (
             <View key={index} style={styles.tag}>
@@ -187,18 +193,11 @@ const ArtistEventCard = ({ item, navigation }) => {
           ))}
         </View>
         <View style={styles.guestListRow}>
-            <Text style={styles.guestListText}>Do You Have a Guest List?</Text>
-             <TouchableOpacity>
-                <Switch
-                  trackColor={{ false: "#767577", true: "#a95eff" }}
-                  thumbColor={showGuestListInput ? "#f4f3f4" : "#f4f3f4"}
-                  ios_backgroundColor="#3e3e3e"
-                  onValueChange={(newValue) => {
-                    setShowGuestListInput(newValue);
-                  }}
-                  value={showGuestListInput}
-                />
-            </TouchableOpacity>
+          <Text style={styles.guestListText}>Do You Have a Guest List?</Text>
+          <CustomToggle
+            value={showGuestListInput}
+            onValueChange={setShowGuestListInput}
+          />
         </View>
 
         {showGuestListInput && (
@@ -352,9 +351,6 @@ const ArtistHomeScreen = ({ navigation }) => {
         >
           Latest Events
         </Text>
-        <TouchableOpacity>
-           <Text style={styles.seeAllText}>See All <Icon name="arrow-right" size={12} color="#a95eff" /></Text>
-        </TouchableOpacity>
       </View>
     </>
   );
@@ -380,56 +376,12 @@ const ArtistHomeScreen = ({ navigation }) => {
       />
 
       {/* Bottom Navigation Bar */}
-      <View style={[styles.bottomNavBar, { paddingBottom: Math.max(insets.bottom, 20) }]}>
-        <TouchableOpacity 
-          style={[styles.navButton, activeTab === 'home' && styles.navButtonActive]} 
-          onPress={() => setActiveTab('home')}
-        >
-          <Ionicons 
-            name={activeTab === 'home' ? "home" : "home-outline"} 
-            size={24} 
-            color={activeTab === 'home' ? "#a95eff" : "#aaa"} 
-          />
-          <Text style={[styles.navButtonText, activeTab === 'home' && styles.navButtonTextActive]}>Home</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={[styles.navButton, activeTab === 'applied' && styles.navButtonActive]}
-          onPress={() => {
-            setActiveTab('applied');
-            navigation.navigate('ArtistApplied');
-          }}
-        >
-          <AppliedIcon width={24} height={24} stroke={activeTab === 'applied' ? "#a95eff" : "#aaa"} />
-          <Text style={[styles.navButtonText, activeTab === 'applied' && styles.navButtonTextActive]}>Applied</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={[styles.navButton, activeTab === 'inbox' && styles.navButtonActive]}
-          onPress={() => {
-            setActiveTab('inbox');
-            navigation.navigate('ArtistInbox');
-          }}
-        >
-          <InboxIcon width={24} height={24} stroke={activeTab === 'inbox' ? "#a95eff" : "#aaa"} />
-          <Text style={[styles.navButtonText, activeTab === 'inbox' && styles.navButtonTextActive]}>Inbox</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={[styles.navButton, activeTab === 'profile' && styles.navButtonActive]}
-          onPress={() => {
-            setActiveTab('profile');
-            navigation.navigate('ArtistProfile');
-          }}
-        >
-          <Ionicons 
-            name={activeTab === 'profile' ? "person" : "person-outline"} 
-            size={24} 
-            color={activeTab === 'profile' ? "#a95eff" : "#aaa"} 
-          />
-          <Text style={[styles.navButtonText, activeTab === 'profile' && styles.navButtonTextActive]}>Profile</Text>
-        </TouchableOpacity>
-      </View>
+      <ArtistBottomNavBar
+        navigation={navigation}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        insets={insets}
+      />
 
       {/* Budget Selection Modal */}
       <Modal
@@ -503,6 +455,9 @@ const styles = StyleSheet.create({
   notificationIcon: {
     padding: dimensions.spacing.sm,
     position: 'relative',
+    borderWidth: 1,
+    borderColor: '#C6C5ED',
+    borderRadius: 20,
   },
     notificationDot: {
     position: 'absolute',
@@ -587,11 +542,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
   },
-  seeAllText: {
-    color: '#a95eff',
-    fontSize: 14,
-    fontWeight: '600',
-  },
   eventCard: {
     backgroundColor: '#1a1a1a',
     borderRadius: 10,
@@ -638,12 +588,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#fff',
-    marginBottom: 4,
   },
-   eventDetailsRow: {
+  eventDetailsRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    alignItems: 'flex-start',
     marginBottom: 4,
+    gap: 8,
+  },
+  eventTimeAndRating: {
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+    gap: 2,
   },
   eventBudget: {
     fontSize: 14,
@@ -741,39 +696,9 @@ const styles = StyleSheet.create({
   },
   bookmarkButton: {
     padding: 8,
-  },
-
-  // New styles for bottom navigation
-  bottomNavBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    backgroundColor: '#000',
-    borderTopWidth: 1,
-    borderTopColor: '#1a1a1a',
-    paddingVertical: 5,
-    paddingBottom: 45, // Adjust for home bar indicator
-  },
-  navButton: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-    paddingVertical: 5,
-  },
-  navButtonActive: {
-    backgroundColor: 'rgba(169, 94, 255, 0.1)',
-    borderRadius: 15,
-    marginHorizontal: 5,
-  },
-  navButtonText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#aaa',
-    marginTop: 4,
-  },
-  navButtonTextActive: {
-    color: '#a95eff',
+    borderWidth: 1,
+    borderColor: '#B15CDE',
+    borderRadius: 14,
   },
 
   // Updated styles for the budget modal to match image

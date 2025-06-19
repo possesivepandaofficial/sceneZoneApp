@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
     marginLeft: 0,
   },
   aboutTextNew: {
-    color: '#b3b3cc',
+    color: 'rgba(179,179,204,0.7)',
     fontSize: 14,
     marginHorizontal: 20,
     marginBottom: 40,

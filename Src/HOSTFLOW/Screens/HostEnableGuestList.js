@@ -1,6 +1,8 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, SafeAreaView, } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, SafeAreaView, Dimensions, Modal } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
+
+const { width } = Dimensions.get('window');
 
 const HostEnableGuestListScreen = ({ navigation }) => {
   // Sample data for the guest list (replace with actual data from your API or state)
@@ -17,8 +19,20 @@ const HostEnableGuestListScreen = ({ navigation }) => {
     { id: '10', name: 'Andromeda Starfire', ticketId: '#8954673009' },
   ];
 
-  const textColor = '#fff';
-  const subColor = '#b3b3cc';
+  const [levelDropdownVisible, setLevelDropdownVisible] = useState(false);
+  const [selectedLevel, setSelectedLevel] = useState('Level 1');
+  const levelOptions = ['Level 1', 'Level 2', 'Level 3'];
+  const filterButtonRef = useRef(null);
+  const [dropdownPos, setDropdownPos] = useState({ x: 0, y: 0, width: 106 });
+
+  const showDropdown = () => {
+    if (filterButtonRef.current) {
+      filterButtonRef.current.measure((fx, fy, w, h, px, py) => {
+        setDropdownPos({ x: px, y: py + h, width: w });
+        setLevelDropdownVisible(true);
+      });
+    }
+  };
 
   // Render each guest item
   const renderGuestItem = ({ item }) => (
@@ -38,12 +52,61 @@ const HostEnableGuestListScreen = ({ navigation }) => {
         <View style={styles.centerTitle}>
           <Text style={styles.headerTitleText}>Guest List</Text>
         </View>
-        {/* Dropdown/Filter (for "Level 1") */}
-        <TouchableOpacity style={styles.filterButton}>
-          <Text style={styles.filterText}>Level 1</Text>
+        {/* Dropdown/Filter (for Level) */}
+        <TouchableOpacity
+          ref={filterButtonRef}
+          style={styles.filterButton}
+          onPress={showDropdown}
+        >
+          <Text style={styles.filterText}>{selectedLevel}</Text>
           <Feather name="chevron-down" size={16} color="#a95eff" style={styles.chevronIcon} />
         </TouchableOpacity>
       </View>
+
+      {/* Dropdown rendered absolutely at root level */}
+      <Modal
+        visible={levelDropdownVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setLevelDropdownVisible(false)}
+      >
+        <TouchableOpacity
+          style={{ flex: 1 }}
+          activeOpacity={1}
+          onPress={() => setLevelDropdownVisible(false)}
+        >
+          <View
+            style={[
+              styles.dropdownMenu,
+              {
+                position: 'absolute',
+                top: dropdownPos.y,
+                left: dropdownPos.x,
+                width: dropdownPos.width,
+                zIndex: 9999,
+              },
+            ]}
+          >
+            {levelOptions.map((level) => (
+              <TouchableOpacity
+                key={level}
+                style={styles.dropdownItem}
+                onPress={() => {
+                  setSelectedLevel(level);
+                  setLevelDropdownVisible(false);
+                }}
+              >
+                <Text style={[
+                  styles.dropdownItemText,
+                  selectedLevel === level && { color: '#a95eff', fontWeight: '700' }
+                ]}>
+                  {level}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </TouchableOpacity>
+      </Modal>
 
       {/* Guest List */}
       <FlatList
@@ -59,9 +122,10 @@ const HostEnableGuestListScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'rgba(26, 26, 31, 1)',
+    backgroundColor: '#121212',
   },
   header: {
+    marginTop:25,
     width: 393,
     height: 64,
     flexDirection: 'row',
@@ -77,6 +141,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 1,
     shadowRadius: 12,
     elevation: 8,
+    paddingTop:25,
   },
   centerTitle: {
     flex: 1,
@@ -86,8 +151,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 700,
     color: '#fff',
-    marginRight:120,
-    lineHeight:24,
+    marginRight:80,
+    lineHeight:20,
   },
   filterButton: {
     flexDirection: 'row',
@@ -117,7 +182,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   guestItem: {
-    backgroundColor: 'rgba(26, 26, 31, 1)',
+    backgroundColor: '#121212',
     borderRadius: 16,
     paddingVertical: 18,
     paddingHorizontal: 18,
@@ -144,6 +209,28 @@ const styles = StyleSheet.create({
     marginTop: 4,
     fontWeight:400,
     color: '#b3b3cc',
+  },
+  dropdownMenu: {
+    backgroundColor: '#23232b',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#B15CDE',
+    minWidth: 106,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 20,
+    zIndex: 9999,
+  },
+  dropdownItem: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+  },
+  dropdownItemText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '500',
   },
 });
 

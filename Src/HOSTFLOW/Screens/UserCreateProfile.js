@@ -78,13 +78,15 @@ const UserCreateProfileScreen = ({ navigation }) => {
 
             {/* Input Fields */}
             <Text style={styles.label}>Full name</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Franklin Clinton"
-              placeholderTextColor="#aaa"
-              value={fullName}
-              onChangeText={setFullName}
-            />
+            <View style={styles.fullNameInputContainer}>
+              <TextInput
+                style={styles.fullNameInput}
+                placeholder="Franklin Clinton"
+                placeholderTextColor="#aaa"
+                value={fullName}
+                onChangeText={setFullName}
+              />
+            </View>
 
             <Text style={styles.label}>Date of Birth</Text>
             <View style={styles.input}>
@@ -224,6 +226,7 @@ const styles = StyleSheet.create({
     padding: 8,
     borderWidth: 2,
     borderColor: '#000',
+    marginRight:120,
   },
   label: {
     fontSize: 14,
@@ -279,6 +282,21 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     lineHeight: 21,
     textAlign: 'center',
+  },
+  fullNameInputContainer: {
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#8D6BFC',
+    backgroundColor: '#121212',
+    marginBottom: 20,
+    paddingHorizontal: 16,
+    height: 48,
+    justifyContent: 'center',
+  },
+  fullNameInput: {
+    color: '#fff',
+    fontSize: 16,
+    flex: 1,
   },
 });
 

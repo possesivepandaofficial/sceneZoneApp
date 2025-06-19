@@ -10,6 +10,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-native-community/blur": "^4.4.1",
     "@react-native-community/checkbox": "^0.5.20",
     "@react-native-community/slider": "^4.5.7",
@@ -20,6 +21,7 @@
     "@reduxjs/toolkit": "^2.8.2",
     "react": "19.0.0",
     "react-native": "0.79.2",
+    "react-native-calendars": "^1.1312.1",
     "react-native-gesture-handler": "^2.25.0",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-reanimated": "^3.18.0",

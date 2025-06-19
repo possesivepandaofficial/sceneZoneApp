@@ -2,7 +2,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from '../Screens/HomeScreen';
-import { View, Text, Image } from 'react-native';
+import { View, Text, Image, Dimensions, Platform } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import EventScreen from '../Screens/EventScreen';
 import ShortlistScreen from '../Screens/ShortListScreen';
@@ -15,6 +15,7 @@ import HomeIcon from '../assets/icons/home';
 import ProfileIcon from '../Components/profile';
 
 const Tab = createBottomTabNavigator();
+const { width, height } = Dimensions.get('window');
 
 const BottomTabNavigator = () => {
   const insets = useSafeAreaInsets();
@@ -26,14 +27,14 @@ const BottomTabNavigator = () => {
         headerShown: false,
         tabBarShowLabel: true,
         tabBarLabelStyle: { 
-          fontSize: 10,
+          fontSize: Math.max(10, width * 0.028),
           marginTop: 4,
         },
         tabBarStyle: {
           backgroundColor: '#000',
           borderTopColor: '#1a1a1a',
-          height: 60 + insets.bottom,
-          paddingBottom: insets.bottom,
+          height: Math.max(60, height * 0.09) + insets.bottom,
+          paddingBottom: insets.bottom > 0 ? insets.bottom : Platform.OS === 'ios' ? 20 : 10,
           paddingTop: 8,
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
@@ -41,8 +42,8 @@ const BottomTabNavigator = () => {
           borderRightWidth: 1,
           borderColor: '#1a1a1a',
           position: 'absolute',
-          left: 10,
-          right: 10,
+          left: 0,
+          right: 0,
           bottom: 0,
           elevation: 8,
           shadowColor: '#000',
@@ -54,20 +55,21 @@ const BottomTabNavigator = () => {
           shadowRadius: 3.84,
         },
         tabBarIcon: ({ color, size, focused }) => {
+          const iconSize = Math.max(24, width * 0.06);
           let iconName;
           let IconComponent;
 
           if (route.name === 'Home') {
-            IconComponent = <HomeIcon width={size} height={size} fill={focused ? '#a95eff' : '#999'} />;
+            IconComponent = <HomeIcon width={iconSize} height={iconSize} fill={focused ? '#a95eff' : '#999'} />;
           }
           else if (route.name === 'Event') {
-            IconComponent = <EventIcon width={size} height={size} fill={focused ? '#a95eff' : '#999'} />;
+            IconComponent = <EventIcon width={iconSize} height={iconSize} fill={focused ? '#a95eff' : '#999'} />;
           }
           else if (route.name === 'Shortlists') {
-            IconComponent = <Shortlist width={size} height={size} fill={focused ? '#a95eff' : '#999'} />;
+            IconComponent = <Shortlist width={iconSize} height={iconSize} fill={focused ? '#a95eff' : '#999'} />;
           }
           else if (route.name === 'Profile') {
-            IconComponent = <ProfileIcon width={size} height={size} fill={focused ? '#a95eff' : '#999'} />;
+            IconComponent = <ProfileIcon width={iconSize} height={iconSize} fill={focused ? '#a95eff' : '#999'} />;
           }
 
           return (

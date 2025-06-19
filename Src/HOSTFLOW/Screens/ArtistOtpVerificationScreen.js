@@ -140,7 +140,6 @@ const ArtistOtpVerificationScreen = ({ navigation }) => {
             {
               paddingLeft: Math.max(responsiveDimensions.safeAreaLeft + dimensions.spacing.md, dimensions.spacing.xl),
               paddingRight: Math.max(responsiveDimensions.safeAreaRight + dimensions.spacing.md, dimensions.spacing.xl),
-              paddingTop: Math.max(dimensions.spacing.xl, 20),
             }
           ]} 
           onPress={() => navigation.goBack()}
@@ -155,7 +154,7 @@ const ArtistOtpVerificationScreen = ({ navigation }) => {
             style={styles.iconImage}
           />
           <Text style={styles.title}>
-            OTP{'\n'}Verification
+            OTP{"\n"}Verification
           </Text>
           <Text style={styles.emailVerifyText}>
             We need to verify your email
@@ -244,34 +243,38 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 24,
     lineHeight: 36,
-    letterSpacing: 0,
+    color: 'rgb(255, 255, 255)',
     textAlign: 'center',
-    marginBottom: dimensions.spacing.xxl,
-    color: 'rgba(198, 197, 237, 1)',
+    alignSelf: 'stretch',
+    letterSpacing: 0,
+    marginBottom: 8,
   },
   emailVerifyText: {
     fontFamily: 'Nunito Sans',
     fontWeight: '400',
-    fontSize: 14,
-    lineHeight: 21,
+    fontSize: 12,
+    lineHeight: 15,
     letterSpacing: 0,
     textAlign: 'center',
     color: '#fff',
     marginBottom: dimensions.spacing.xxl,
   },
   subtitle: {
-    fontSize: dimensions.fontSize.body,
+    fontFamily: 'Nunito Sans',
+    fontWeight: '400',
+    fontSize: 12,
+    lineHeight: 21,
+    color: '#fff',
+    letterSpacing: 0,
     textAlign: 'center',
-    marginBottom: dimensions.spacing.xxxl,
-    color: '#aaa',
-    paddingHorizontal: dimensions.spacing.xl,
-    lineHeight: Math.max(dimensions.fontSize.body + 6, 20),
+    marginBottom: 32,
   },
   otpRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    marginBottom: dimensions.spacing.xxxl,
+    marginBottom: 10,
+    marginTop: 12,
     paddingHorizontal: isSmallPhone ? dimensions.spacing.sm : dimensions.spacing.lg,
     gap: dimensions.spacing.sm,
   },
@@ -290,14 +293,15 @@ const styles = StyleSheet.create({
     minHeight: 44,
   },
   primaryButton: {
-    width: 361,
-    height: 52,
+    width: 325,
+    height: 44,
     gap: 10,
     borderRadius: 14,
     paddingRight: 16,
     paddingLeft: 16,
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 32,
     marginBottom: dimensions.spacing.xl,
     shadowColor: '#a95eff',
     shadowOffset: { width: 0, height: 4 },
@@ -308,7 +312,7 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     fontFamily: 'Nunito Sans',
     fontWeight: '500',
-    fontSize: 14,
+    fontSize: 13,
     lineHeight: 21,
     letterSpacing: 0,
     textAlign: 'center',
@@ -316,8 +320,8 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 1)',
   },
   resendButton: {
-    width: 361,
-    height: 52,
+    width: 325,
+    height: 44,
     gap: 10,
     borderRadius: 14,
     paddingRight: 16,
@@ -327,17 +331,17 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: -8,
   },
   resendText: {
     fontFamily: 'Nunito Sans',
     fontWeight: '500',
-    fontSize: 14,
+    fontSize: 13,
     lineHeight: 21,
     letterSpacing: 0,
     textAlign: 'center',
     textAlignVertical: 'center',
     color: 'rgba(198, 197, 237, 1)',
-    textDecorationLine: 'underline',
   },
 });
 

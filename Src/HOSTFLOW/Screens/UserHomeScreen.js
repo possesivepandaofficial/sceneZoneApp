@@ -8,7 +8,8 @@ import {
   Image,
   ScrollView,
   Dimensions,
-  Animated
+  Animated,
+  Modal
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -20,6 +21,7 @@ import { toggleFavorite, selectIsFavorite } from '../Redux/slices/favoritesSlice
 import { selectIsLoggedIn } from '../Redux/slices/authSlice';
 import Video from 'react-native-video';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import MaskedView from '@react-native-masked-view/masked-view';
 import Scenezone from '../assets/icons/Scenezone';
 import Spotlight from '../assets/icons/Spotlight';
 import Sports from '../assets/icons/Sports';
@@ -74,13 +76,13 @@ const dimensions = {
   },
   buttonHeight: Math.max(height * 0.06, 44),
   iconSize: Math.max(width * 0.06, 20),
-  navIconSize: Math.max(width * 0.065, 24),
+  navIconSize: Math.max(width * 0.055, 20),
   cardWidth: Math.min(width * 0.8, isTablet ? 400 : 320),
   imageHeight: Math.max(height * 0.25, 180),
   categoryCardHeight: Math.max(height * 0.12, 100),
   exploreCardHeight: Math.min(height * 0.65, 520),
   logoHeight: Math.max(height * 0.06, 40),
-  bottomNavHeight: Math.max(height * 0.1, 70),
+  bottomNavHeight: 48,
 };
 
 const userData = {
@@ -268,8 +270,6 @@ const CategoryNavIcon = ({ type, isActive = false }) => {
     />
   );
 };
-
-
 
 const UserHomeScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
@@ -506,6 +506,117 @@ const UserHomeScreen = ({ navigation, route }) => {
     },
   ];
 
+  // Filter modal logic (copied from HomeScreen)
+  const [showFilter, setShowFilter] = useState(false);
+  const [selected, setSelected] = useState({
+    filter: 'Today',
+    price: 'Low - High',
+    instrument: 'Acoustic Guitar',
+    genre: 'Soul Queen',
+  });
+  const filterOptions = {
+    filter: ['Near - Far', 'Far - Near', 'Today', 'This Week' ,'This Weekend','Next Weekend','1km-3km','3km-5km','5km+'],
+    price: ['Low - High', 'High - Low', 'Tickets under ₹1000','₹1000-₹2000','₹2000-₹3000','₹3000+'],
+    instrument: ['Electric Guitar', 'Saxophone', 'Acoustic Guitar', 'Synthesizer','Drum Machine','Banjo','Trumpet','Turntables'],
+    type: ['Musician', 'Comedian', 'Magician', 'Anchor','Dancer','Poet','Dj','Other'],
+  };
+  const renderPills = (section) => (
+    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+      {filterOptions[section].map((option) => (
+        <TouchableOpacity
+          key={option}
+          style={[
+            styles.pillOption,
+            selected[section] === option && styles.pillOptionActive,
+          ]}
+          onPress={() => setSelected((prev) => ({ ...prev, [section]: option }))}
+        >
+          <Text
+            style={[
+              styles.pillOptionText,
+              selected[section] === option && styles.pillOptionTextActive,
+            ]}
+          >
+            {option}
+          </Text>
+        </TouchableOpacity>
+      ))}
+    </ScrollView>
+  );
+
+  const FilterModal = () => (
+    <Modal visible={showFilter} animationType="slide" transparent>
+      <View style={styles.modalOverlay}>
+        <LinearGradient
+          colors={["#7952FC", "#B15CDE"]}
+          start={{ x: 0, y: 1 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.modalContainer}
+        >
+          {/* Close Button */}
+          <TouchableOpacity 
+            style={styles.closeButton} 
+            onPress={() => setShowFilter(false)}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="close" size={24} color="#7952FC" />
+          </TouchableOpacity>
+
+          {/* Scrollable Filter Content */}
+          <ScrollView style={{flex: 1}} contentContainerStyle={{paddingBottom: 0}}>
+            {/* FILTER Section */}
+            <View style={styles.sectionContainer}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>FILTER</Text>
+              </View>
+              <View style={styles.pillsRow}>
+                {renderPills('filter')}
+              </View>
+            </View>
+            {/* PRICE Section */}
+            <View style={styles.sectionContainer}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>PRICE</Text>
+              </View>
+              <View style={styles.pillsRow}>
+                {renderPills('price')}
+              </View>
+            </View>
+            {/* INSTRUMENT Section */}
+            <View style={styles.sectionContainer}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>INSTRUMENT</Text>
+              </View>
+              <View style={styles.pillsRow}>
+                {renderPills('instrument')}
+              </View>
+            </View>
+            {/* GENRE Section */}
+            <View style={styles.sectionContainer}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>GENRE</Text>
+              </View>
+              <View style={styles.pillsRow}>
+                {renderPills('type')}
+              </View>
+            </View>
+          </ScrollView>
+
+          {/* Fixed Continue Button */}
+          <View style={styles.fixedButtonContainer}>
+            <TouchableOpacity 
+              style={styles.continueButton} 
+              onPress={() => setShowFilter(false)}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.continueButtonText}>Continue</Text>
+            </TouchableOpacity>
+          </View>
+        </LinearGradient>
+      </View>
+    </Modal>
+  );
+
   return (
     <SafeAreaView style={[styles.container, {
       paddingTop: insets.top,
@@ -515,9 +626,9 @@ const UserHomeScreen = ({ navigation, route }) => {
     }]}>
       <ScrollView 
         showsVerticalScrollIndicator={false} 
-        style={styles.contentArea} 
-        stickyHeaderIndices={[3, 5]}
-        contentContainerStyle={{ paddingBottom: Math.max(insets.bottom + dimensions.bottomNavHeight, 90) }}
+        style={styles.contentArea}
+        stickyHeaderIndices={[3]}
+        contentContainerStyle={{ paddingBottom: 120 }}
       >
         {/* Featured Events Section (Horizontal Scroll) - Now includes header */}
         <LinearGradient
@@ -534,7 +645,46 @@ const UserHomeScreen = ({ navigation, route }) => {
           {/* Header content */}
           <View style={styles.headerContentBelowLogo}>
             <View>
-              <Text style={styles.greeting}>Hello Brandon!</Text>
+              <MaskedView
+                maskElement={
+                  <Text
+                    style={[
+                      styles.greeting,
+                      {
+                        fontFamily: 'Poppins',
+                        fontSize: 22,
+                        fontWeight: '700',
+                        lineHeight: 28,
+                        backgroundColor: 'transparent',
+                      },
+                    ]}
+                  >
+                    Hello Brandon!
+                  </Text>
+                }
+              >
+                <LinearGradient
+                  colors={["#B15CDE", "#7952FC"]}
+                  start={{ x: 1, y: 0 }}
+                  end={{ x: 0, y: 0 }}
+                  style={{ height: 28 }}
+                >
+                  <Text
+                    style={[
+                      styles.greeting,
+                      {
+                        opacity: 0,
+                        fontFamily: 'Poppins',
+                        fontSize: 24,
+                        fontWeight: '700',
+                        lineHeight: 28,
+                      },
+                    ]}
+                  >
+                    Hello Brandon!
+                  </Text>
+                </LinearGradient>
+              </MaskedView>
               <View style={styles.locationContainer}>
                 <MaterialIcons name="location-on" size={dimensions.iconSize} color="#a95eff" />
                 <Text style={styles.locationText}>H-70, Sector 63, Noida</Text>
@@ -578,7 +728,7 @@ const UserHomeScreen = ({ navigation, route }) => {
         <View style={styles.bookingButtonsContainer}>
           <TouchableOpacity 
             style={styles.bookingButton} 
-            onPress={() => handleFeatureNavigation('ArtistBooking')}
+            onPress={() => handleFeatureNavigation('Signup')}
           >
             <Text style={styles.bookingButtonText} numberOfLines={1} ellipsizeMode="tail">Artist Booking</Text>
             <Icon name="chevron-right" size={dimensions.iconSize} color="#a95eff" />
@@ -602,7 +752,7 @@ const UserHomeScreen = ({ navigation, route }) => {
               onPress={() => handleFeatureNavigation('SpotlightEvents')}
             >
               <Image 
-                source={require('../assets/Images/f11.png')} 
+                source={require('../assets/Images/Banner0.png')} 
                 style={styles.categoryImage}
                 resizeMode="cover"
               />
@@ -614,7 +764,7 @@ const UserHomeScreen = ({ navigation, route }) => {
               onPress={() => handleFeatureNavigation('SportsScreening')}
             >
               <Image 
-                source={require('../assets/Images/f12.png')} 
+                source={require('../assets/Images/Banner1.png')} 
                 style={styles.categoryImage}
                 resizeMode="cover"
               />
@@ -626,7 +776,7 @@ const UserHomeScreen = ({ navigation, route }) => {
               onPress={() => handleFeatureNavigation('MusicParty')}
             >
               <Image 
-                source={require('../assets/Images/f13.png')} 
+                source={require('../assets/Images/Banner2.png')} 
                 style={styles.categoryImage}
                 resizeMode="cover"
               />
@@ -638,7 +788,7 @@ const UserHomeScreen = ({ navigation, route }) => {
               onPress={() => handleFeatureNavigation('TrendingEvents')}
             >
               <Image 
-                source={require('../assets/Images/f14.png')} 
+                source={require('../assets/Images/Banner3.png')} 
                 style={styles.categoryImage}
                 resizeMode="cover"
               />
@@ -650,7 +800,19 @@ const UserHomeScreen = ({ navigation, route }) => {
               onPress={() => handleFeatureNavigation('Comedy')}
             >
               <Image 
-                source={require('../assets/Images/f15.png')} 
+                source={require('../assets/Images/Banner4.png')} 
+                style={styles.categoryImage}
+                resizeMode="cover"
+              />
+              <View style={styles.categoryOverlay} />
+            </TouchableOpacity>
+            {/* workshop card*/}
+            <TouchableOpacity 
+              style={styles.categoryCard} 
+              onPress={() => handleFeatureNavigation('Workshop')}
+            >
+              <Image 
+                source={require('../assets/Images/Banner5.png')} 
                 style={styles.categoryImage}
                 resizeMode="cover"
               />
@@ -660,12 +822,7 @@ const UserHomeScreen = ({ navigation, route }) => {
         </View>
 
         {/* Category Navbar - sticky below Get Your Vibe */}
-        <View style={[
-          styles.categoryNavbarContainer,
-          {
-            paddingTop: Math.max(insets.top, dimensions.spacing.lg),
-          }
-        ]}>
+        <View style={styles.categoryNavbarContainer}>
           <View style={styles.categoryNavbarScroll}>
             {/* Spotlight Button */}
             <TouchableOpacity 
@@ -718,6 +875,14 @@ const UserHomeScreen = ({ navigation, route }) => {
           </View>
         </View>
 
+        {/* White divider line below category navbar */}
+        <View style={{
+          height: 1,
+          backgroundColor: '#fff',
+          opacity: 0.12,
+          width: '100%',
+        }} />
+
         {/* Latest Events Section */}
         <View style={[styles.section, { marginBottom: 0 }]}>
           <Text style={styles.sectionTitle}>Latest Events</Text>
@@ -728,23 +893,41 @@ const UserHomeScreen = ({ navigation, route }) => {
           </ScrollView>
         </View>
 
+        {/* Plan for Section */}
+        <View style={[styles.section, { marginTop: dimensions.spacing.md, marginBottom: 0 }]}>
+          <Text style={styles.sectionTitle}>Plan for</Text>
+          <View style={styles.planForButtonsContainer}>
+            <TouchableOpacity onPress={() => handleFeatureNavigation('TodayEvents')} style={{marginLeft: -16}}>
+              <Plan1 width={162} height={139} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleFeatureNavigation('WeeklyEvents')} style={{marginLeft: -56}}>
+              <Plan2 width={162} height={139} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleFeatureNavigation('WeekendEvents')} style={{marginLeft: -56}}>
+              <Plan3 width={162} height={139} />
+            </TouchableOpacity>
+          </View>
+        </View> 
+
         {/* Category Filter Buttons - Second Sticky Section */}
         <View style={[
           styles.categoryFilterContainer,
           {
-            top: Math.max(insets.top, dimensions.spacing.lg) + dimensions.spacing.lg * 2 + Math.max(dimensions.buttonHeight, 44),
+            marginTop: 0,
           }
         ]}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryFilterScroll}>
-            {/* Filter Button */}
-            <TouchableOpacity style={styles.filterButton}>
+           {/* Filter Button */}
+            
+             <TouchableOpacity style={styles.filterButton} onPress={() => setShowFilter(true)}>
               <Text style={styles.filterButtonText}>Filter</Text>
               <Ionicons name="options-outline" size={dimensions.iconSize} color="#fff" style={{marginLeft: dimensions.spacing.sm}} />
-            </TouchableOpacity>
+            </TouchableOpacity> 
             {/* Nearby Button */}
             <TouchableOpacity style={styles.categoryFilterButton}>
               <Text style={styles.categoryFilterButtonText}>Nearby</Text>
             </TouchableOpacity>
+            
             {/* Today Button */}
             <TouchableOpacity style={styles.categoryFilterButton}>
               <Text style={styles.categoryFilterButtonText}>Today</Text>
@@ -774,22 +957,6 @@ const UserHomeScreen = ({ navigation, route }) => {
               <Text style={styles.categoryFilterButtonText}>₹5000+</Text>
             </TouchableOpacity>
           </ScrollView>
-        </View>
-
-        {/* Plan for Section */}
-        <View style={[styles.section, { marginTop: dimensions.spacing.xxxl * 4 }]}>
-          <Text style={styles.sectionTitle}>Plan for</Text>
-          <View style={styles.planForButtonsContainer}>
-            <TouchableOpacity onPress={() => handleFeatureNavigation('TodayEvents')}>
-              <Plan1 width={162} height={139} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleFeatureNavigation('WeeklyEvents')} style={{marginLeft: -44}}>
-              <Plan2 width={162} height={139} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleFeatureNavigation('WeekendEvents')} style={{marginLeft: -44}}>
-              <Plan3 width={162} height={139} />
-            </TouchableOpacity>
-          </View>
         </View>
 
         {/* Explore 74 events around you Section */}
@@ -824,38 +991,7 @@ const UserHomeScreen = ({ navigation, route }) => {
         </View>
 
       </ScrollView>
-
-      {/* Bottom Navigation */}
-      <View style={[styles.bottomNav, { paddingBottom: Math.max(insets.bottom + dimensions.spacing.md, 20) }]}>
-        <TouchableOpacity 
-          style={styles.navItem} 
-          onPress={() => handleFeatureNavigation('UserHome')}
-        >
-          <Ionicons name="home" size={dimensions.navIconSize} color="#a95eff" />
-          <Text style={[styles.navItemText, styles.navItemTextActive]}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={styles.navItem} 
-          onPress={() => handleFeatureNavigation('UserFavoriteScreen')}
-        >
-          <Ionicons name="heart-outline" size={dimensions.navIconSize} color="#fff" />
-          <Text style={styles.navItemText}>Favorite</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={styles.navItem} 
-          onPress={() => handleFeatureNavigation('UserTicketScreen')}
-        >
-          <MaterialIcons name="confirmation-num" size={dimensions.navIconSize} color="#fff" />
-          <Text style={styles.navItemText}>My Ticket</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={styles.navItem} 
-          onPress={() => handleFeatureNavigation('UserProfileScreen')}
-        >
-          <Ionicons name="person-outline" size={dimensions.navIconSize} color="#fff" />
-          <Text style={styles.navItemText}>Profile</Text>
-        </TouchableOpacity>
-      </View>
+      {FilterModal()}
     </SafeAreaView>
   );
 };
@@ -930,6 +1066,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
+    borderRadius: dimensions.borderRadius.lg,
+    overflow: 'hidden',
   },
   eventCardContent: {
     position: 'relative',
@@ -938,6 +1076,8 @@ const styles = StyleSheet.create({
   eventImage: {
     width: '100%',
     height: Math.min(width * 1.0, height * 0.5),
+    borderRadius: dimensions.borderRadius.lg,
+    overflow: 'hidden',
   },
   imageOverlay: {
     position: 'absolute',
@@ -946,6 +1086,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    borderRadius: dimensions.borderRadius.lg,
   },
   heartIconPlaceholder: {
     position: 'absolute',
@@ -1051,52 +1192,23 @@ const styles = StyleSheet.create({
     marginBottom: dimensions.spacing.lg,
   },
   sectionTitle: {
-    color: '#C6C5ED',
-    fontFamily: 'Inter',
-    fontSize: 16,
+    color: '#FFF',
+    textAlign: 'left',
+    fontFamily: 'Poppins',
+    fontSize: 13,
     fontStyle: 'normal',
-    fontWeight: '600',
-    lineHeight: 24,
-    width: 361,
-    marginBottom: dimensions.spacing.lg,
+    fontWeight: '800',
+    textTransform: 'uppercase',
+    letterSpacing: 0.2,
+    marginBottom: 8,
   },
   placeholderText: {
     color: '#aaa',
     fontSize: dimensions.fontSize.title,
   },
-  bottomNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    backgroundColor: '#1c1c1c',
-    paddingVertical: dimensions.spacing.lg,
-    borderTopWidth: 1,
-    borderColor: '#333',
-    minHeight: dimensions.bottomNavHeight,
-  },
-  navItem: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: dimensions.spacing.sm,
-    minHeight: Math.max(dimensions.buttonHeight * 0.8, 36),
-    justifyContent: 'center',
-  },
-  navIcon: {
-    width: dimensions.navIconSize,
-    height: dimensions.navIconSize,
-    marginBottom: dimensions.spacing.xs,
-  },
-  navItemText: {
-    fontSize: dimensions.fontSize.small,
-    color: '#fff',
-    marginTop: dimensions.spacing.xs,
-  },
-  navItemTextActive: {
-    color: '#a95eff',
-  },
   eventCardContainerHorizontalScroll: {
     width: dimensions.cardWidth,
-    marginRight: dimensions.spacing.xl,
+    marginRight: 0,
     borderRadius: dimensions.borderRadius.lg,
     overflow: 'hidden',
     position: 'relative',
@@ -1118,7 +1230,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
   },
   categoryText: {
     position: 'absolute',
@@ -1187,10 +1299,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-start',
     alignItems: 'flex-end',
-    gap: 0,
+    gap: 12,
     width: '100%',
     marginHorizontal: 0,
     marginBottom: dimensions.spacing.xxxl,
+    
   },
   calendarPlanForButton: {
     flex: 1,
@@ -1201,6 +1314,7 @@ const styles = StyleSheet.create({
     paddingTop: dimensions.spacing.md,
     paddingHorizontal: dimensions.spacing.md,
     paddingBottom: dimensions.spacing.md,
+    
   },
   calendarIndicators: {
     flexDirection: 'row',
@@ -1260,8 +1374,6 @@ const styles = StyleSheet.create({
     zIndex: 100,
     borderBottomWidth: 1,
     borderBottomColor: '#333',
-    position: 'sticky',
-    top: 60,
   },
   categoryFilterScroll: {
     flexDirection: 'row',
@@ -1286,7 +1398,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Nunito Sans',
     fontSize: 12,
     fontStyle: 'normal',
-    fontWeight: '600',
+    fontWeight: '500',
     lineHeight: 21,
     marginRight: dimensions.spacing.sm,
   },
@@ -1390,8 +1502,15 @@ const styles = StyleSheet.create({
     borderRadius: dimensions.borderRadius.md,
   },
   latestEventDetailsContainer: {
-    padding: 12,
     backgroundColor: 'rgba(36,36,45,0.92)',
+    borderBottomLeftRadius: 16,
+    borderBottomRightRadius: 16,
+    padding: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.18,
+    shadowRadius: 8,
+    elevation: 8,
   },
   latestEventTitle: {
     overflow: 'hidden',
@@ -1499,7 +1618,7 @@ const styles = StyleSheet.create({
     width: width - 32, // 16px margin on each side
     height: 620,
     marginBottom: 22,
-    borderRadius: 10,
+    borderRadius: 20,
     overflow: 'hidden',
     backgroundColor: '#222',
     position: 'relative',
@@ -1601,6 +1720,126 @@ const styles = StyleSheet.create({
     fontSize: dimensions.fontSize.xlarge,
     fontWeight: 'bold',
     color: '#fff',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    width: 393,
+    maxWidth: '100%',
+    height: 498,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+    backgroundColor: 'transparent',
+    paddingTop: 32,
+    paddingHorizontal: 24,
+    paddingBottom: 16,
+    alignSelf: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -15 },
+    shadowOpacity: 0.4,
+    shadowRadius: 34,
+    elevation: 20,
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  filterContent: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    marginTop: 24,
+  },
+  sectionContainer: {
+    marginBottom: 2,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  sectionTitle: {
+    color: '#FFF',
+    textAlign: 'left',
+    fontFamily: 'Poppins',
+    fontSize: 13,
+    fontStyle: 'normal',
+    fontWeight: '800',
+    textTransform: 'uppercase',
+    letterSpacing: 0.2,
+    marginBottom: 8,
+  },
+  pillsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    marginBottom: 26,
+  },
+  pillOption: {
+    display: 'flex',
+    height: 26,
+    paddingHorizontal: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 360,
+    backgroundColor: 'rgba(255,255,255,0.20)',
+    marginRight: 6,
+    marginBottom: 6,
+  },
+  pillOptionActive: {
+    backgroundColor: '#fff',
+  },
+  pillOptionText: {
+    color: '#fff',
+    fontFamily: 'Nunito Sans',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  pillOptionTextActive: {
+    color: '#7952FC',
+    fontWeight: '700',
+  },
+  fixedButtonContainer: {
+    alignItems: 'center',
+    marginTop: 12,
+    marginBottom: 8,
+  },
+  continueButton: {
+    width: '100%',
+    maxWidth: 361,
+    height: 56,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#fff',
+    borderRadius: 16,
+    backgroundColor: 'transparent',
+    marginTop: 8,
+  },
+  continueButtonText: {
+    color: '#fff',
+    fontSize: 17,
+    fontWeight: '600',
+    fontFamily: 'Nunito Sans',
   },
 });
 

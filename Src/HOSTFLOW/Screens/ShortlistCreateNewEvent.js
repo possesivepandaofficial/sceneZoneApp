@@ -9,11 +9,13 @@ import {
   Platform,
   Dimensions,
   ScrollView,
+  Modal,
 } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Feather from 'react-native-vector-icons/Feather';
 import CameraIcon from '../assets/icons/Camera';
 import LinearGradient from 'react-native-linear-gradient';
+import { Calendar } from 'react-native-calendars';
 
 const { width, height } = Dimensions.get('window');
 
@@ -75,6 +77,7 @@ const ShortlistCreateNewEventContent = ({ navigation }) => {
   const [time, setTime] = useState('');
   const [genre, setGenre] = useState('');
   const [soundSystemAvailable, setSoundSystemAvailable] = useState(false);
+  const [calendarVisible, setCalendarVisible] = useState(false);
 
   return (
     <LinearGradient
@@ -128,8 +131,10 @@ const ShortlistCreateNewEventContent = ({ navigation }) => {
               minHeight: Math.max(dimensions.buttonHeight * 0.7, 40),
             }
           ]}>
-            <Feather name="calendar" size={Math.max(dimensions.iconSize * 0.8, 18)} color="#a95eff" />
-            <Text style={styles.dateText}>06/16/23</Text>
+            <TouchableOpacity onPress={() => setCalendarVisible(true)} style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Feather name="calendar" size={Math.max(dimensions.iconSize * 0.8, 18)} color="#a95eff" />
+              <Text style={styles.dateText}>{date ? date : 'DD/MM/YYYY'}</Text>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -207,12 +212,7 @@ const ShortlistCreateNewEventContent = ({ navigation }) => {
         ]}>
           <View style={styles.dateInputContainer}>
             <Text style={styles.label}>Date</Text>
-            <View style={[
-              styles.inputWithIcon,
-              {
-                minHeight: Math.max(dimensions.inputHeight, 48),
-              }
-            ]}>
+            <View style={styles.inputWithIcon}>
               <TextInput
                 style={styles.dateTimeInput}
                 value={date}
@@ -222,12 +222,14 @@ const ShortlistCreateNewEventContent = ({ navigation }) => {
                 keyboardType="numeric"
                 maxLength={10}
               />
-              <Feather 
-                name="calendar" 
-                size={Math.max(dimensions.iconSize * 0.8, 18)} 
-                color="#a95eff" 
-                style={styles.inputIcon} 
-              />
+              <TouchableOpacity onPress={() => setCalendarVisible(true)}>
+                <Feather 
+                  name="calendar" 
+                  size={Math.max(dimensions.iconSize * 0.8, 18)} 
+                  color="#a95eff" 
+                  style={styles.inputIcon} 
+                />
+              </TouchableOpacity>
             </View>
           </View>
           <View style={styles.timeInputContainer}>
@@ -320,6 +322,50 @@ const ShortlistCreateNewEventContent = ({ navigation }) => {
           <Text style={styles.continueButtonText}>Continue</Text>
         </TouchableOpacity>
       </ScrollView>
+      <Modal
+        visible={calendarVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setCalendarVisible(false)}
+      >
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ backgroundColor: '#fff', borderRadius: 16, padding: 20, width: '90%' }}>
+            <Calendar
+              onDayPress={day => {
+                setDate(day.dateString.split('-').reverse().join('/'));
+                setCalendarVisible(false);
+              }}
+              theme={{
+                backgroundColor: '#fff',
+                calendarBackground: '#fff',
+                textSectionTitleColor: '#b6c1cd',
+                selectedDayBackgroundColor: '#B15CDE',
+                selectedDayTextColor: '#fff',
+                todayTextColor: '#B15CDE',
+                dayTextColor: '#2d4150',
+                textDisabledColor: '#d9e1e8',
+                dotColor: '#B15CDE',
+                selectedDotColor: '#fff',
+                arrowColor: '#B15CDE',
+                monthTextColor: '#7952FC',
+                indicatorColor: '#7952FC',
+                textDayFontFamily: 'Nunito Sans',
+                textMonthFontFamily: 'Nunito Sans',
+                textDayHeaderFontFamily: 'Nunito Sans',
+                textDayFontWeight: '400',
+                textMonthFontWeight: '700',
+                textDayHeaderFontWeight: '400',
+                textDayFontSize: 16,
+                textMonthFontSize: 18,
+                textDayHeaderFontSize: 12,
+              }}
+            />
+            <TouchableOpacity onPress={() => setCalendarVisible(false)} style={{ marginTop: 16, alignSelf: 'center' }}>
+              <Text style={{ color: '#B15CDE', fontWeight: '700', fontSize: 16 }}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </LinearGradient>
   );
 };
@@ -530,13 +576,11 @@ const styles = StyleSheet.create({
   },
   continueButton: {
     display: 'flex',
-    width: 320,
-    height: 44,
-   // paddingHorizontal: 12,
+    width: '90%',
+    height: dimensions.buttonHeight,
     paddingVertical: 0,
     justifyContent: 'center',
     alignItems: 'center',
-    //gap: 8,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#FFF',

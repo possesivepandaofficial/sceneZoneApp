@@ -11,6 +11,7 @@ import {
 import Icon from 'react-native-vector-icons/Feather';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import LinearGradient from 'react-native-linear-gradient';
 
 const genres = ['Rock', 'Jazz', 'Hip Hop', 'Classical', 'Reggae', 'Electronic', 'Blues', 'Country', 'Pop', 'Metal'];
 
@@ -86,16 +87,24 @@ const ArtistUpload = ({ navigation }) => {
         </View>
 
         <Text style={styles.label}>Upload Your Video</Text>
-        <TouchableOpacity style={styles.videoUploadContainer}>
-          {/* Placeholder for upload icon and text */}
-          <MaterialIcons name="photo-camera" size={30} color="#a95eff" />
-          <Text style={styles.uploadVideoText}>Upload Video</Text>
-        </TouchableOpacity>
+        <View style={styles.videoUploadSection}>
+          <TouchableOpacity style={styles.uploadVideoButton}>
+            <MaterialIcons name="photo-camera" size={24} color="#BCA4F7" />
+            <Text style={styles.uploadVideoButtonText}>Upload Video</Text>
+          </TouchableOpacity>
+        </View>
 
         {/* Main Upload Button */}
-        <TouchableOpacity style={styles.uploadButton} onPress={handleUpload}>
-           <Text style={styles.uploadButtonText}>Upload</Text>
-        </TouchableOpacity>
+        <LinearGradient
+          colors={['#B15CDE', '#7952FC']}
+          start={{ x: 0, y: 0.5 }}
+          end={{ x: 1, y: 0.5 }}
+          style={styles.uploadButton}
+        >
+          <TouchableOpacity style={{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', flexDirection: 'row', gap: 10 }} onPress={handleUpload}>
+            <Text style={styles.uploadButtonText}>Upload</Text>
+          </TouchableOpacity>
+        </LinearGradient>
 
       </ScrollView>
     </SafeAreaView>
@@ -118,31 +127,38 @@ const styles = StyleSheet.create({
     borderBottomColor: '#333',
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 14,
+    fontWeight: '600',
     color: '#fff',
+    marginRight:110,
   },
   scrollContent: {
     padding: 20,
     paddingBottom: 50, // Add padding to the bottom
   },
   label: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#fff',
+    color: '#7A7A90',
+    fontFamily: 'Nunito Sans',
+    fontSize: 12,
+    fontStyle: 'normal',
+    fontWeight: '400',
+    lineHeight: 18,
     marginBottom: 8,
     marginTop: 15,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderColor: '#555',
+    borderColor: '#24242D',
     borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    marginBottom: 15,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 0,
     height: 48,
-    backgroundColor: '#1a1a1a', // Input background color
+    backgroundColor: '#121212',
+    gap: 12,
+    alignSelf: 'stretch',
+    marginBottom: 15,
   },
   input: {
     flex: 1,
@@ -157,45 +173,79 @@ const styles = StyleSheet.create({
   starIcon: {
     marginRight: 5,
   },
-  videoUploadContainer: {
+  videoUploadSection: {
+    height: 290,
+    padding: 16,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#a95eff', // Border color
-    borderRadius: 8,
-    padding: 20,
-    alignItems: 'center',
+    borderColor: '#8D6BFC',
+    backgroundColor: '#121212',
+    display: 'flex',
     justifyContent: 'center',
-    marginBottom: 20,
-    height: 200, // Example height
+    alignItems: 'flex-end',
+    alignSelf: 'stretch',
+    marginBottom: 24,
   },
-  uploadVideoText: {
-    color: '#a95eff',
-    fontSize: 16,
-    fontWeight: '600',
-    marginTop: 10,
+  uploadVideoButton: {
+  marginTop:200,
+    display: 'flex',
+    flexDirection: 'row',
+    paddingVertical: 10,
+    paddingHorizontal: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 10,
+    alignSelf: 'stretch',
+    borderRadius: 8,
+    borderWidth: 1,
+    
+    backgroundColor: '#19191a',
+    // Simulate blur with a subtle shadow (React Native doesn't support real blur on View)
+    shadowColor: '#8D6BFC',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  uploadVideoButtonText: {
+    color: '#BCA4F7',
+    fontSize: 13,
+    fontWeight: '400',
+    marginLeft: 10,
   },
   uploadButton: {
-    backgroundColor: '#a95eff', // Purple background
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: 'center',
+    display: 'flex',
+    width: 361,
+    height: 52,
+    paddingHorizontal: 16,
+    paddingVertical: 0,
     justifyContent: 'center',
+    alignItems: 'center',
+    gap: 10,
+    flexShrink: 0,
+    borderRadius: 14,
+    overflow: 'hidden',
+    alignSelf: 'center',
     marginBottom: 20,
   },
   uploadButtonText: {
     color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 14,
+    fontWeight: '400',
   },
   dropdownInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderColor: '#555',
+    borderColor: '#24242D',
     borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    marginBottom: 0,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 0,
     height: 48,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#121212',
+    gap: 12,
+    alignSelf: 'stretch',
+    marginBottom: 0,
     justifyContent: 'space-between',
   },
   dropdownInputText: {

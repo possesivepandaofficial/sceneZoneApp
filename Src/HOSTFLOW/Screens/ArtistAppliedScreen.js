@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, Dimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Feather';
 import Ionicons from 'react-native-vector-icons/Ionicons'; // Assuming Ionicons for trash icon
 import FontAwesome from 'react-native-vector-icons/FontAwesome'; // Assuming FontAwesome for star icon
+import ArtistBottomNavBar from '../Components/ArtistBottomNavBar';
+import LinearGradient from 'react-native-linear-gradient';
 
 const { width, height } = Dimensions.get('window');
 
@@ -50,20 +52,33 @@ const appliedRequestsData = [
     genres: ['Drums', 'Violin', 'Saxophone', 'Harp', 'Ukulele'],
     rating: 4,
     status: 'pending',
+    image: require('../assets/Images/fff.jpg'),
   },
   {
     id: '2',
     location: 'Delhi',
     budget: '$400-$500',
     time: '09:30 AM',
-    genres: ['Piano', 'Guitar', 'Vocals'],
+    genres: ['Drums', 'Violin', 'Saxophone', 'Harp', 'Ukulele'],
     rating: 4,
-    status: 'pending',
+    status: 'canceled',
+    image: require('../assets/Images/fff.jpg'),
   },
-  // Add more placeholder data here
+  {
+    id: '3',
+    location: 'Sounds of Celebration',
+    budget: '$400-$500',
+    time: '09:30 AM',
+    genres: ['Drums', 'Violin', 'Saxophone', 'Harp', 'Ukulele'],
+    rating: 4,
+    status: 'approved',
+    image: require('../assets/Images/fff.jpg'),
+  },
+  // Add more cards as needed
 ];
 
 const ArtistAppliedScreen = ({ navigation }) => {
+  const [activeTab, setActiveTab] = useState('applied');
   const insets = useSafeAreaInsets();
 
   const renderAppliedItem = ({ item }) => {
@@ -103,12 +118,31 @@ const ArtistAppliedScreen = ({ navigation }) => {
             ))}
           </View>
           <View style={styles.buttonRow}>
-            <TouchableOpacity style={styles.requestPendingButton}>
-              <Text style={styles.requestPendingText}>Request Pending</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.deleteButton}>
-              <Ionicons name="trash-outline" size={Math.max(dimensions.iconSize * 0.8, 18)} color="#fff" />
-            </TouchableOpacity>
+            {item.status === 'pending' && (
+              <TouchableOpacity style={styles.requestPendingButton}>
+                <Text style={styles.requestPendingText}>Request Pending</Text>
+              </TouchableOpacity>
+            )}
+            {item.status === 'approved' && (
+              <TouchableOpacity style={styles.requestApprovedButton}>
+                <Text style={styles.requestApprovedText}>Request Approved</Text>
+              </TouchableOpacity>
+            )}
+            {item.status === 'canceled' && (
+              <TouchableOpacity style={styles.requestCanceledButton}>
+                <Text style={styles.requestCanceledText}>Request Canceled</Text>
+              </TouchableOpacity>
+            )}
+            <LinearGradient
+              colors={['#B15CDE', '#7952FC']}
+              start={{ x: 0, y: 0.5 }}
+              end={{ x: 1, y: 0.5 }}
+              style={styles.deleteButtonGradient}
+            >
+              <TouchableOpacity style={styles.deleteButton}>
+                <Ionicons name="trash-outline" size={22} color="#fff" />
+              </TouchableOpacity>
+            </LinearGradient>
           </View>
         </View>
       </View>
@@ -118,9 +152,6 @@ const ArtistAppliedScreen = ({ navigation }) => {
   return (
     <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
       <View style={styles.header}>
-         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Icon name="arrow-left" size={dimensions.iconSize} color="#fff" />
-        </TouchableOpacity>
         <Text style={styles.headerTitle}>Applied</Text>
         <View style={{ width: dimensions.iconSize }} />
       </View>
@@ -130,6 +161,12 @@ const ArtistAppliedScreen = ({ navigation }) => {
         keyExtractor={(item) => item.id}
         contentContainerStyle={[styles.listContent, { paddingBottom: Math.max(insets.bottom + 20, 40) }]}
         showsVerticalScrollIndicator={false}
+      />
+      <ArtistBottomNavBar
+        navigation={navigation}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        insets={insets}
       />
     </View>
   );
@@ -150,17 +187,12 @@ const styles = StyleSheet.create({
     borderBottomColor: '#333',
     minHeight: dimensions.headerHeight,
   },
-  backButton: {
-    minWidth: dimensions.iconSize,
-    minHeight: dimensions.iconSize,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: dimensions.spacing.xs,
-  },
   headerTitle: {
     fontSize: dimensions.fontSize.header,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#C6C5ED',
+    marginRight:220,
+    
   },
   listContent: {
     paddingHorizontal: dimensions.spacing.lg,
@@ -181,7 +213,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   cardImageContainer: {
-    width: '100%',
+    width: '92%',
     height: dimensions.cardImageHeight,
     backgroundColor: '#333',
     justifyContent: 'flex-end',
@@ -189,7 +221,10 @@ const styles = StyleSheet.create({
     position: 'relative',
     borderRadius: 20,
     overflow: 'hidden',
-    
+    marginLeft:13,
+    marginTop:20,
+   
+    marginBottom: 18,
   },
   cardContent: {
     padding: dimensions.cardPadding,
@@ -197,8 +232,8 @@ const styles = StyleSheet.create({
   cardRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: dimensions.spacing.xs,
     alignItems: 'center',
+    marginBottom: dimensions.spacing.xs,
   },
   locationText: {
     fontSize: dimensions.fontSize.header,
@@ -206,8 +241,14 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   timeText: {
-    fontSize: dimensions.fontSize.body,
-    color: '#aaa',
+    color: '#7952FC',
+    textAlign: 'center',
+    fontFamily: 'Inter',
+    fontSize: 12,
+    fontStyle: 'normal',
+    fontWeight: '600',
+    lineHeight: 24,
+    fontFeatureSettings: "'salt' on",
   },
   budgetText: {
     fontSize: dimensions.fontSize.title,
@@ -273,14 +314,68 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     fontFeatureSettings: "'salt' on",
   },
-  deleteButton: {
-    backgroundColor: '#dc3545',
-    borderRadius: dimensions.borderRadius.sm,
-    padding: dimensions.spacing.md,
+  requestApprovedButton: {
+    display: 'flex',
+    paddingTop: 4,
+    paddingBottom: 4,
+    paddingLeft: 12,
+    paddingRight: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    minWidth: dimensions.buttonHeight,
-    minHeight: dimensions.buttonHeight,
+    gap: 4,
+    flex: 1,
+    alignSelf: 'stretch',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#00C853',
+  },
+  requestApprovedText: {
+    color: '#00C853',
+    fontFamily: 'Inter',
+    fontSize: 14,
+    fontStyle: 'normal',
+    fontWeight: '500',
+    lineHeight: 20,
+    fontFeatureSettings: "'salt' on",
+  },
+  requestCanceledButton: {
+    display: 'flex',
+    paddingTop: 4,
+    paddingBottom: 4,
+    paddingLeft: 12,
+    paddingRight: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 4,
+    flex: 1,
+    alignSelf: 'stretch',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#FF3B30',
+  },
+  requestCanceledText: {
+    color: '#FF3B30',
+    fontFamily: 'Inter',
+    fontSize: 14,
+    fontStyle: 'normal',
+    fontWeight: '500',
+    lineHeight: 20,
+    fontFeatureSettings: "'salt' on",
+  },
+  deleteButtonGradient: {
+    width: 42,
+    height: 42,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  deleteButton: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+    padding: 0,
+    margin: 0,
   },
   dateBox: {
     backgroundColor: 'rgba(0, 0, 0, 0.7)',

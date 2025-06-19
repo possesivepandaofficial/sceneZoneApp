@@ -9,21 +9,37 @@ import {
   SafeAreaView,
   Dimensions,
   Switch,
+  ScrollView,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/Ionicons';
 import GoogleIcon from '../assets/icons/Google';
 import AppleIcon from '../assets/icons/Apple';
 import SignUpBackground from '../assets/Banners/SignUp';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import FullNameIcon from '../assets/icons/fullname';
+import MobileIcon from '../assets/icons/mobile';
+import LocationIcon from '../assets/icons/location';
+import LockIcon from '../assets/icons/lock';
 
 const { width, height } = Dimensions.get('window');
 
 const UserSignupScreen = ({ navigation }) => {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
+  const insets = useSafeAreaInsets();
+
+  // Responsive padding based on screen size
+  const dynamicPadding = {
+    paddingTop: insets.top + height * 0.04, // 4% of screen height + safe area
+    paddingBottom: insets.bottom + height * 0.04,
+    paddingLeft: insets.left + width * 0.05, // 5% of screen width + safe area
+    paddingRight: insets.right + width * 0.05,
+  };
 
   const [fullName, setFullName] = useState('');
   const [mobile, setMobile] = useState('');
+  const [location, setLocation] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
@@ -33,15 +49,24 @@ const UserSignupScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {
+      paddingTop: insets.top,
+      paddingBottom: insets.bottom,
+      paddingLeft: insets.left,
+      paddingRight: insets.right,
+    }]}> 
       <SignUpBackground 
         style={styles.backgroundSvg}
         width={width}
         height={height}
       />
       <SafeAreaView style={styles.overlay}>
-        <View style={styles.inner}>
-          <Text style={[styles.header, { color: '#fff' }]}>Create new{'\n'}user account</Text>
+        <ScrollView
+          contentContainerStyle={[styles.inner, dynamicPadding]}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <Text style={[styles.header, { color: '#fff' }]}>Create new{"\n"}user account</Text>
 
           <Text style={styles.signinText}>
             Already have an account?{' '}
@@ -54,7 +79,7 @@ const UserSignupScreen = ({ navigation }) => {
           </Text>
 
           <View style={styles.inputContainer}>
-            <Icon name="person-outline" size={20} color="#aaa" style={styles.icon} />
+            <FullNameIcon width={20} height={20} style={styles.icon} />
             <TextInput
               style={[styles.input, { color: '#fff' }]}
               placeholder="Full Name"
@@ -65,7 +90,7 @@ const UserSignupScreen = ({ navigation }) => {
           </View>
 
           <View style={styles.inputContainer}>
-            <Icon name="call-outline" size={20} color="#aaa" style={styles.icon} />
+            <MobileIcon width={20} height={20} style={styles.icon} />
             <TextInput
               style={[styles.input, { color: '#fff' }]}
               placeholder="Mobile Number"
@@ -76,8 +101,19 @@ const UserSignupScreen = ({ navigation }) => {
             />
           </View>
 
+          <View style={styles.inputContainer}>
+            <LocationIcon width={20} height={20} style={styles.icon} />
+            <TextInput
+              style={[styles.input, { color: '#fff' }]}
+              placeholder="Location"
+              placeholderTextColor="#aaa"
+              value={location}
+              onChangeText={setLocation}
+            />
+          </View>
+
           <View style={[styles.inputContainer, styles.passwordContainer]}>
-            <Icon name="lock-closed-outline" size={20} color="#aaa" style={styles.icon} />
+            <LockIcon width={20} height={20} style={styles.icon} />
             <TextInput
               style={[styles.input, { color: '#fff' }]}
               placeholder="Create Password"
@@ -113,12 +149,12 @@ const UserSignupScreen = ({ navigation }) => {
 
           <Text style={[styles.orText, { color: '#ccc' }]}>or sign up with</Text>
 
-          <TouchableOpacity style={styles.socialButton}>
+          <TouchableOpacity style={[styles.socialButton, { backgroundColor: '#000' }]}> 
             <GoogleIcon style={styles.socialIcon} width={24} height={24} />
             <Text style={styles.socialButtonText}>Sign up with Google</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.socialButton}>
+          <TouchableOpacity style={[styles.socialButton, { backgroundColor: '#000' }]}> 
             <AppleIcon style={styles.socialIcon} width={24} height={24} />
             <Text style={styles.socialButtonText}>Sign up with Apple</Text>
           </TouchableOpacity>
@@ -127,7 +163,7 @@ const UserSignupScreen = ({ navigation }) => {
             <Text style={styles.linkText}>Term of Use</Text> and{' '}
             <Text style={styles.linkText}>Privacy Policy</Text>
           </Text>
-        </View>
+        </ScrollView>
       </SafeAreaView>
     </View>
   );
@@ -136,7 +172,7 @@ const UserSignupScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#121212',
   },
   backgroundSvg: {
     position: 'absolute',
@@ -157,20 +193,23 @@ const styles = StyleSheet.create({
   header: {
     fontFamily: 'Nunito Sans',
     fontWeight: '800',
-    fontSize: 30,
+    fontSize: 25,
     lineHeight: 40,
     letterSpacing: 0,
     marginTop: 0,
     marginBottom: 10,
+    paddingTop: 20,
+    color: '#C6C5ED',
+    alignSelf: 'stretch',
   },
   signinText: {
     fontFamily: 'Nunito Sans',
     fontWeight: '400',
-    fontSize: 14,
+    fontSize: 12,
     lineHeight: 21,
     letterSpacing: 0,
     color: '#aaa',
-    marginBottom: 40,
+    marginBottom: 25,
   },
   signinLink: {
     fontFamily: 'Nunito Sans',
@@ -181,21 +220,27 @@ const styles = StyleSheet.create({
     color: '#A020F0',
   },
   inputContainer: {
-    width: 361,
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     borderColor: '#555',
     borderWidth: 1,
     borderRadius: 8,
-    paddingHorizontal: 10,
+    paddingHorizontal: 8,
     marginBottom: 15,
-    height: 48,
+    height: 40,
+    backgroundColor: '#000',
+  },
+  passwordContainer: {
+    borderColor: '#8D6BFC',
+    borderWidth: 1,
   },
   icon: {
     marginRight: 8,
   },
   input: {
     flex: 1,
+    fontSize: 14,
   },
   rememberMeRow: {
     flexDirection: 'row',
@@ -203,39 +248,59 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   signupButton: {
-    borderRadius: 8,
-    height: 48,
+    width: '100%',
+    height: 42,
+    gap: 10,
+    borderRadius: 14,
+    paddingRight: 16,
+    paddingLeft: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 30,
   },
   signupButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    fontFamily: 'Nunito Sans',
+    fontWeight: '500',
+    fontSize: 12,
+    lineHeight: 21,
+    letterSpacing: 0,
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    color: 'rgba(255, 255, 255, 1)',
   },
   orText: {
+    fontSize:11,
     textAlign: 'center',
-    marginBottom: 15,
+    marginBottom: 25,
+  },
+  socialButton: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderColor: '#3F3F46',
+    borderWidth: 1,
+    borderRadius: 14,
+    padding: 8,
+    marginBottom: 12,
+    backgroundColor: '#000',
+    height: 40,
+  },
+  socialButtonText: {
+    marginLeft: 10,
+    fontFamily: 'Nunito Sans',
+    fontWeight: '500',
+    fontSize: 12,
+    lineHeight: 19,
+    letterSpacing: 0,
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    color: 'rgba(198, 197, 237, 1)',
   },
   socialIcon: {
     width: 24,
     height: 24,
-  },
-  socialButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderColor: '#aaa',
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 12,
-  },
-  socialButtonText: {
-    marginLeft: 10,
-    fontWeight: '500',
-    fontSize: 14,
-    color: '#fff',
+    resizeMode: 'contain',
   },
   termsText: {
     fontSize: 12,
@@ -244,9 +309,7 @@ const styles = StyleSheet.create({
   },
   linkText: {
     color: '#A020F0',
-  },
-  passwordContainer: {
-    borderColor: 'rgba(141, 107, 252, 1)',
+    fontWeight: '700',
   },
 });
 

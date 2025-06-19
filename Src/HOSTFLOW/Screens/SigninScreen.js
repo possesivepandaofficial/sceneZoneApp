@@ -123,7 +123,7 @@ const SignInScreen = ({ navigation }) => {
               </TouchableOpacity>
               <Text style={[styles.rememberText, { color: text }]}> Remember me</Text>
             </View>
-            <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
+            <TouchableOpacity onPress={() => navigation.navigate('ForgotPasswordScreen')}>
               <Text style={styles.forgot}>Forgot Password</Text>
             </TouchableOpacity>
           </View>

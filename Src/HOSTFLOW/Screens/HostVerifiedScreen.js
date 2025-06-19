@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -47,9 +47,12 @@ const VerificationSuccessIcon = (props) => (
 );
 
 const HostVerifiedScreen = ({ navigation }) => {
-  const handleScreenTap = () => {
-    navigation.navigate('MainTabs');
-  };
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.navigate('MainTabs');
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [navigation]);
 
   return (
     <View style={styles.container}>
@@ -59,14 +62,10 @@ const HostVerifiedScreen = ({ navigation }) => {
         height={height}
       />
       <SafeAreaView style={styles.overlay}>
-        <TouchableOpacity 
-          style={styles.content} 
-          onPress={handleScreenTap}
-          activeOpacity={1}
-        >
+        <View style={styles.content}>
           <VerificationSuccessIcon style={styles.icon} />
           <Text style={styles.title}>Verification Success</Text>
-        </TouchableOpacity>
+        </View>
       </SafeAreaView>
     </View>
   );

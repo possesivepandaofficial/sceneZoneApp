@@ -17,6 +17,7 @@ import { loginArtist } from '../Redux/slices/authSlice';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Dimensions } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import CustomToggle from '../Components/CustomToggle';
 
 const { width, height } = Dimensions.get('window');
 
@@ -47,6 +48,7 @@ const CreateProfile = ({ navigation }) => {
   const [instrument, setInstrument] = useState('');
   const [budget, setBudget] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [crowdGuarantee, setCrowdGuarantee] = useState(false);
   const dispatch = useDispatch();
   const insets = useSafeAreaInsets();
 
@@ -316,6 +318,13 @@ const CreateProfile = ({ navigation }) => {
             keyboardType="phone-pad"
           />
         </View>
+        <View style={styles.crowdGuaranteeRow}>
+          <Text style={styles.label}>Crowd Guarantee</Text>
+          <CustomToggle
+            value={crowdGuarantee}
+            onValueChange={setCrowdGuarantee}
+          />
+        </View>
 
         <View style={styles.galleryHeader}>
           <Text style={styles.label}>Performance Gallery</Text>
@@ -561,6 +570,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#a95eff',
+  },
+  crowdGuaranteeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 8,
+    marginBottom: 8,
+    paddingHorizontal: 4,
   },
 });
 

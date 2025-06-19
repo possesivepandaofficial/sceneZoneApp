@@ -9,39 +9,87 @@ import {
   SafeAreaView,
   Dimensions,
   Switch,
+  ScrollView,
+  Alert,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import Icon from 'react-native-vector-icons/Ionicons';
 import GoogleIcon from '../assets/icons/Google';
 import AppleIcon from '../assets/icons/Apple';
 import SignUpBackground from '../assets/Banners/SignUp';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import FullNameIcon from '../assets/icons/fullname';
+import MobileIcon from '../assets/icons/mobile';
+import LockIcon from '../assets/icons/lock';
 
 const { width, height } = Dimensions.get('window');
 
 const ArtistSignupScreen = ({ navigation }) => {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
+  const insets = useSafeAreaInsets();
+
+  // Responsive padding based on screen size
+  const dynamicPadding = {
+    paddingTop: insets.top + height * 0.04, // 4% of screen height + safe area
+    paddingBottom: insets.bottom + height * 0.04,
+    paddingLeft: insets.left + width * 0.05, // 5% of screen width + safe area
+    paddingRight: insets.right + width * 0.05,
+  };
 
   const [fullName, setFullName] = useState('');
   const [mobile, setMobile] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleSignUp = () => {
-    navigation.navigate('ArtistSigninScreen');
+    // Validate inputs
+    if (!fullName.trim() || !mobile.trim() || !password.trim()) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
+
+    if (password.length < 6) {
+      Alert.alert('Error', 'Password must be at least 6 characters long');
+      return;
+    }
+
+    setLoading(true);
+
+    // Simulate signup process
+    setTimeout(() => {
+      setLoading(false);
+      Alert.alert('Success', 'Account created successfully!', [
+        {
+          text: 'OK',
+          onPress: () => {
+            navigation.navigate('ArtistSigninScreen');
+          },
+        },
+      ]);
+    }, 2000);
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {
+      paddingTop: insets.top,
+      paddingBottom: insets.bottom,
+      paddingLeft: insets.left,
+      paddingRight: insets.right,
+    }]}> 
       <SignUpBackground 
         style={styles.backgroundSvg}
         width={width}
         height={height}
       />
       <SafeAreaView style={styles.overlay}>
-        <View style={styles.inner}>
-          <Text style={[styles.header, { color: '#fff' }]}>Create new{'\n'}Artist account</Text>
+        <ScrollView
+          contentContainerStyle={[styles.inner, dynamicPadding]}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <Text style={[styles.header, { color: '#fff' }]}>Create new{"\n"}Artist account</Text>
 
           <Text style={styles.signinText}>
             Already have an account?{' '}
@@ -54,7 +102,7 @@ const ArtistSignupScreen = ({ navigation }) => {
           </Text>
 
           <View style={styles.inputContainer}>
-            <Icon name="person-outline" size={20} color="#aaa" style={styles.icon} />
+            <FullNameIcon width={20} height={20} style={styles.icon} />
             <TextInput
               style={[styles.input, { color: '#fff' }]}
               placeholder="Full Name"
@@ -65,7 +113,7 @@ const ArtistSignupScreen = ({ navigation }) => {
           </View>
 
           <View style={styles.inputContainer}>
-            <Icon name="call-outline" size={20} color="#aaa" style={styles.icon} />
+            <MobileIcon width={20} height={20} style={styles.icon} />
             <TextInput
               style={[styles.input, { color: '#fff' }]}
               placeholder="Mobile Number"
@@ -77,7 +125,7 @@ const ArtistSignupScreen = ({ navigation }) => {
           </View>
 
           <View style={[styles.inputContainer, styles.passwordContainer]}>
-            <Icon name="lock-closed-outline" size={20} color="#aaa" style={styles.icon} />
+            <LockIcon width={20} height={20} style={styles.icon} />
             <TextInput
               style={[styles.input, { color: '#fff' }]}
               placeholder="Create Password"
@@ -87,7 +135,7 @@ const ArtistSignupScreen = ({ navigation }) => {
               onChangeText={setPassword}
             />
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-              <Icon name={showPassword ? 'eye-off' : 'eye'} size={20} color="#aaa" />
+              <LockIcon width={20} height={20} style={styles.icon} />
             </TouchableOpacity>
           </View>
 
@@ -100,25 +148,27 @@ const ArtistSignupScreen = ({ navigation }) => {
             <Text style={{ color: '#fff' }}> Remember me</Text>
           </View>
 
-          <TouchableOpacity onPress={handleSignUp}>
+          <TouchableOpacity onPress={handleSignUp} disabled={loading}>
             <LinearGradient 
               colors={['#B15CDE', '#7952FC']} 
               start={{x: 1, y: 0}}
               end={{x: 0, y: 0}}
-              style={styles.signupButton}
+              style={[styles.signupButton, loading && styles.signupButtonDisabled]}
             >
-              <Text style={styles.signupButtonText}>Sign Up</Text>
+              <Text style={styles.signupButtonText}>
+                {loading ? 'Creating Account...' : 'Sign Up'}
+              </Text>
             </LinearGradient>
           </TouchableOpacity>
 
           <Text style={[styles.orText, { color: '#ccc' }]}>or sign up with</Text>
 
-          <TouchableOpacity style={styles.socialButton}>
+          <TouchableOpacity style={[styles.socialButton, { backgroundColor: '#000' }]}> 
             <GoogleIcon style={styles.socialIcon} width={24} height={24} />
             <Text style={styles.socialButtonText}>Sign up with Google</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.socialButton}>
+          <TouchableOpacity style={[styles.socialButton, { backgroundColor: '#000' }]}> 
             <AppleIcon style={styles.socialIcon} width={24} height={24} />
             <Text style={styles.socialButtonText}>Sign up with Apple</Text>
           </TouchableOpacity>
@@ -127,7 +177,7 @@ const ArtistSignupScreen = ({ navigation }) => {
             <Text style={styles.linkText}>Term of Use</Text> and{' '}
             <Text style={styles.linkText}>Privacy Policy</Text>
           </Text>
-        </View>
+        </ScrollView>
       </SafeAreaView>
     </View>
   );
@@ -157,20 +207,23 @@ const styles = StyleSheet.create({
   header: {
     fontFamily: 'Nunito Sans',
     fontWeight: '800',
-    fontSize: 30,
+    fontSize: 25,
     lineHeight: 40,
     letterSpacing: 0,
     marginTop: 0,
     marginBottom: 10,
+    paddingTop: 20,
+    color: '#C6C5ED',
+    alignSelf: 'stretch',
   },
   signinText: {
     fontFamily: 'Nunito Sans',
     fontWeight: '400',
-    fontSize: 14,
+    fontSize: 12,
     lineHeight: 21,
     letterSpacing: 0,
     color: '#aaa',
-    marginBottom: 40,
+    marginBottom: 25,
   },
   signinLink: {
     fontFamily: 'Nunito Sans',
@@ -181,24 +234,27 @@ const styles = StyleSheet.create({
     color: '#A020F0',
   },
   inputContainer: {
-    width: 361,
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     borderColor: '#555',
     borderWidth: 1,
     borderRadius: 8,
-    paddingHorizontal: 10,
+    paddingHorizontal: 8,
     marginBottom: 15,
-    height: 48,
+    height: 40,
+    backgroundColor: '#000',
   },
   passwordContainer: {
-    borderColor: 'rgba(141, 107, 252, 1)',
+    borderColor: '#8D6BFC',
+    borderWidth: 1,
   },
   icon: {
     marginRight: 8,
   },
   input: {
     flex: 1,
+    fontSize: 14,
   },
   rememberMeRow: {
     flexDirection: 'row',
@@ -206,8 +262,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   signupButton: {
-    width: 361,
-    height: 52,
+    width: '100%',
+    height: 42,
     gap: 10,
     borderRadius: 14,
     paddingRight: 16,
@@ -219,7 +275,7 @@ const styles = StyleSheet.create({
   signupButtonText: {
     fontFamily: 'Nunito Sans',
     fontWeight: '500',
-    fontSize: 14,
+    fontSize: 12,
     lineHeight: 21,
     letterSpacing: 0,
     textAlign: 'center',
@@ -227,36 +283,50 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 1)',
   },
   orText: {
+    fontSize:11,
     textAlign: 'center',
     marginBottom: 25,
   },
   socialButton: {
-    width: 361,
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-    borderColor: '#aaa',
+    justifyContent: 'center',
+    borderColor: '#3F3F46',
     borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    height: 48,
+    borderRadius: 14,
+    padding: 8,
     marginBottom: 12,
-  },
-  socialIcon: {
-    marginRight: 10,
+    backgroundColor: '#000',
+    height: 40,
   },
   socialButtonText: {
-    flex: 1,
+    marginLeft: 10,
+    fontFamily: 'Nunito Sans',
+    fontWeight: '500',
+    fontSize: 12,
+    lineHeight: 19,
+    letterSpacing: 0,
     textAlign: 'center',
-    color: '#fff',
-    fontWeight: 'bold',
+    textAlignVertical: 'center',
+    color: 'rgba(198, 197, 237, 1)',
+  },
+  socialIcon: {
+    width: 24,
+    height: 24,
+    resizeMode: 'contain',
   },
   termsText: {
+    fontSize: 12,
     textAlign: 'center',
-    color: '#aaa',
+    marginTop: 10,
   },
   linkText: {
     color: '#A020F0',
-    fontWeight: '600',
+    fontWeight: '700',
+  },
+  signupButtonDisabled: {
+    backgroundColor: '#555',
   },
 });
 

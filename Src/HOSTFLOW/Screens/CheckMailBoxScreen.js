@@ -7,177 +7,246 @@ import {
   StyleSheet,
   Dimensions,
   SafeAreaView,
-  Image,
+  ScrollView,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Feather';
+import LinearGradient from 'react-native-linear-gradient';
+import SignUpBackground from '../assets/Banners/SignUp';
+import MailboxIcon from '../assets/icons/mailbox';
 
-const { width } = Dimensions.get('window');
-const boxSize = width / 7;
+const { width, height } = Dimensions.get('window');
 
 const CheckMailboxScreen = ({ navigation }) => {
   const [otp, setOtp] = useState(['', '', '', '']);
-  const inputs = useRef([]);
+  const insets = useSafeAreaInsets();
+  const inputRefs = [
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+  ];
 
-  const handleChange = (text, index) => {
+  const handleOtpChange = (text, index) => {
     const newOtp = [...otp];
-    if (text.length > 1) {
-      const chars = text.split('').slice(0, 4);
-      chars.forEach((char, i) => {
-        newOtp[i] = char;
-        if (inputs.current[i]) inputs.current[i].setNativeProps({ text: char });
-      });
-      setOtp(newOtp);
-      inputs.current[chars.length - 1]?.focus();
-      return;
-    }
-
     newOtp[index] = text;
     setOtp(newOtp);
-
-    if (text && index < 3) {
-      inputs.current[index + 1].focus();
+    if (text !== '' && index < otp.length - 1) {
+      inputRefs[index + 1].current.focus();
+    }
+    if (text === '' && index > 0) {
+      inputRefs[index - 1].current.focus();
     }
   };
 
-  const handleKeyPress = (e, index) => {
-    if (e.nativeEvent.key === 'Backspace') {
-      if (otp[index] === '' && index > 0) {
-        inputs.current[index - 1].focus();
-        const newOtp = [...otp];
-        newOtp[index - 1] = '';
-        setOtp(newOtp);
-      }
-    }
+  const handleResendOTP = () => {
+    // Handle resend OTP logic
   };
 
   const handleConfirm = () => {
-    navigation.navigate('CreateNewPassword'); // Adjust screen name if needed
+    navigation.navigate('CreateNewPassword');
   };
 
   return (
-    <SafeAreaView style={[styles.container]}>
-      <TouchableOpacity style={styles.backIcon} onPress={() => navigation.goBack()}>
-        <Icon name="arrow-left" size={24} color="#fff" />
-      </TouchableOpacity>
+    <View style={styles.container}>
+      <SignUpBackground 
+        style={styles.backgroundSvg}
+        width={width}
+        height={height}
+      />
+      <SafeAreaView style={styles.overlay}>
+        <ScrollView contentContainerStyle={styles.scrollViewContent}>
+          <View style={[styles.header, { paddingTop: insets.top + 20 }]}> 
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Icon name="arrow-left" size={24} color="#fff" />
+            </TouchableOpacity>
+          </View>
 
-      <View style={styles.content}>
-        <Image
-          source={require('../assets/Images/CheckMail.png')}
-          style={styles.mailIcon}
-        />
-        <Text style={styles.title}>Check Your Mailbox</Text>
-        <Text style={styles.subtitle}>
-          Please enter the 4 digit OTP code that we sent to your email (**********n@gmail.com)
-        </Text>
+          <View style={styles.contentArea}>
+            {/* Central Icon */}
+            <View style={styles.iconContainer}>
+              <MailboxIcon width={53} height={52} />
+            </View>
 
-        <View style={styles.otpRow}>
-          {otp.map((digit, index) => (
-            <TextInput
-              key={index}
-              ref={(ref) => (inputs.current[index] = ref)}
-              style={styles.otpInput}
-              maxLength={1}
-              keyboardType="number-pad"
-              value={digit}
-              onChangeText={(text) => handleChange(text, index)}
-              onKeyPress={(e) => handleKeyPress(e, index)}
-              textAlign="center"
-              autoFocus={index === 0}
-              selectionColor="#a95eff"
-              returnKeyType="done"
-              blurOnSubmit={false}
-            />
-          ))}
+            <Text style={styles.title}>Check Your Mailbox</Text>
+            <Text style={styles.description}>
+              Please enter the 4 digit OTP code that we sent to your
+              email (**********n@gmail.com)
+            </Text>
+
+            {/* OTP Input Fields */}
+            <View style={styles.otpContainer}>
+              {otp.map((digit, index) => (
+                <TextInput
+                  key={index}
+                  style={styles.otpInput}
+                  keyboardType="number-pad"
+                  maxLength={1}
+                  onChangeText={(text) => handleOtpChange(text, index)}
+                  value={digit}
+                  ref={inputRefs[index]}
+                  textAlign={'center'}
+                  selectionColor={'#a95eff'}
+                />
+              ))}
+            </View>
+          </View>
+        </ScrollView>
+
+        {/* Buttons at bottom */}
+        <View style={[styles.buttonContainer, { bottom: insets.bottom + 20 }]}> 
+          <TouchableOpacity style={styles.resendButton} onPress={handleResendOTP}>
+            <LinearGradient 
+              colors={['#B15CDE', '#7952FC']} 
+              start={{x: 1, y: 0}}
+              end={{x: 0, y: 0}}
+              style={styles.resendButtonGradient}
+            >
+              <Text style={styles.resendButtonText}>Resend OTP</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
+            <Text style={styles.confirmButtonTextBorder}>Confirm</Text>
+          </TouchableOpacity>
         </View>
-
-        <TouchableOpacity onPress={() => navigation.navigate('CheckMailBox')} style={styles.resendButton}>
-          <Text style={styles.resendText}>Resend OTP</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.primaryButton} onPress={handleConfirm}>
-          <Text style={styles.primaryButtonText}>Confirm</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  container: { 
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#121212',
   },
-  backIcon: {
+  backgroundSvg: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: 'transparent',
+  },
+  scrollViewContent: {
+    flexGrow: 1,
     paddingHorizontal: 20,
-    paddingTop: 10,
+    paddingBottom: 160, // Add padding at the bottom to prevent buttons from covering content
   },
-  content: {
-    padding: 24,
-    alignItems: 'center',
+  header: {
+    // paddingTop will be set dynamically with safe area insets
+  },
+  contentArea: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    marginTop: 80,
   },
-  mailIcon: {
-    width: 100,
-    height: 100,
-    resizeMode: 'contain',
-    marginBottom: 20,
+  iconContainer: {
+    backgroundColor: '#1a1a1a',
+    borderRadius: 20,
+    padding: 15,
+    marginBottom: 30,
   },
   title: {
-    fontSize: 22,
+    fontFamily: 'Nunito Sans',
     fontWeight: '700',
+    fontSize: 24,
+    lineHeight: 36,
+    letterSpacing: 0,
+    textAlign: 'center',
+    color: 'rgba(198, 197, 237, 1)',
     marginBottom: 10,
-    color: '#fff',
-    textAlign: 'center',
   },
-  subtitle: {
+  description: {
+    width: 361,
+    height: 42,
+    opacity: 0.8,
+    fontFamily: 'Nunito Sans',
+    fontWeight: '400',
     fontSize: 14,
+    lineHeight: 21,
+    letterSpacing: 0,
     textAlign: 'center',
+    color: 'rgba(198, 197, 237, 1)',
     marginBottom: 30,
-    color: '#aaa',
+    paddingHorizontal: 20,
   },
-  otpRow: {
+  otpContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '100%',
+    width: '80%',
     marginBottom: 30,
   },
   otpInput: {
-    width: boxSize,
-    height: boxSize,
-    borderRadius: 10,
-    fontSize: 20,
-    fontWeight: 'bold',
-    borderWidth: 1,
-    borderColor: '#333',
-    color: '#fff',
-    backgroundColor: '#1a1a1a',
-  },
-  resendButton: {
+    width: 50,
+    height: 50,
     borderWidth: 1,
     borderColor: '#a95eff',
-    paddingVertical: 14,
     borderRadius: 10,
-    alignItems: 'center',
-    width: '100%',
-    marginBottom: 15,
-  },
-  resendText: {
-    color: '#a95eff',
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  primaryButton: {
-    backgroundColor: '#a95eff',
-    paddingVertical: 14,
-    borderRadius: 10,
-    alignItems: 'center',
-    width: '100%',
-  },
-  primaryButtonText: {
+    fontSize: 20,
     color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    textAlign: 'center',
+  },
+  buttonContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    padding: 20,
+    backgroundColor: 'transparent',
+    alignItems: 'center',
+  },
+  resendButton: {
+    width: 361,
+    height: 52,
+    gap: 10,
+    borderRadius: 14,
+    paddingRight: 16,
+    paddingLeft: 16,
+    overflow: 'hidden',
+    marginBottom: 12,
+  },
+  resendButtonGradient: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 14,
+  },
+  resendButtonText: {
+    fontFamily: 'Nunito Sans',
+    fontWeight: '500',
+    fontSize: 14,
+    lineHeight: 21,
+    letterSpacing: 0,
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    color: 'rgba(255, 255, 255, 1)',
+  },
+  confirmButton: {
+    width: 361,
+    height: 52,
+    gap: 10,
+    borderRadius: 14,
+    paddingRight: 16,
+    paddingLeft: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(198, 197, 237, 1)',
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  confirmButtonTextBorder: {
+    fontFamily: 'Nunito Sans',
+    fontWeight: '500',
+    fontSize: 14,
+    lineHeight: 21,
+    letterSpacing: 0,
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    color: 'rgba(198, 197, 237, 1)',
   },
 });
 

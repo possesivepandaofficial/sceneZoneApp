@@ -36,7 +36,7 @@ const CreateNewPasswordScreen = ({ navigation }) => {
     // After delay, close modal and navigate
     setTimeout(() => {
       setShowSuccessModal(false);
-      navigation.navigate('Home'); // adjust target screen name
+      navigation.navigate('MainTabs'); // adjust target screen name
     }, 2000);
   };
 

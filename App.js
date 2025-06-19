@@ -47,6 +47,7 @@ import UserSignupScreen from './Src/HOSTFLOW/Screens/UserSignup';
 import UserSigninScreen from './Src/HOSTFLOW/Screens/UserSignin';
 import UserCreateProfileScreen from './Src/HOSTFLOW/Screens/UserCreateProfile';
 import UserOtpVerificationScreen from './Src/HOSTFLOW/Screens/UserOtpVerification';
+import UserVerifiedScreen from './Src/HOSTFLOW/Screens/UserVerified';
 import UserForgotPasswordScreen from './Src/HOSTFLOW/Screens/UserForgotPassword';
 import UserOtpResetScreen from './Src/HOSTFLOW/Screens/UserOtpReset';
 import UserHomeScreen from './Src/HOSTFLOW/Screens/UserHomeScreen';
@@ -87,6 +88,12 @@ import ArtistUpload from './Src/HOSTFLOW/Screens/ArtistUpload';
 import HomeScreen from './Src/HOSTFLOW/Screens/HomeScreen';
 import HostVerifiedScreen from './Src/HOSTFLOW/Screens/HostVerifiedScreen';
 import HostAddPayment from './Src/HOSTFLOW/Screens/HostAddPayment';
+import ArtistForgotPasswordScreen from './Src/HOSTFLOW/Screens/ArtistForgotPasswordScreen';
+import ArtistCheckMailbox from './Src/HOSTFLOW/Screens/ArtistCheckMailbox';
+import ArtistCreateNewPassword from './Src/HOSTFLOW/Screens/ArtistCreateNewPassword';
+import UserBottomTabNavigator from './Src/HOSTFLOW/Components/UserBottomTabNavigator';
+import HostDiscount from './Src/HOSTFLOW/Screens/HostDiscount';
+import UserTicketDownload from './Src/HOSTFLOW/Screens/UserTicketDownload';
 
 const Stack = createNativeStackNavigator();
 
@@ -172,6 +179,9 @@ export default function App() {
               }}
             />
             <Stack.Screen name="ArtistSigninScreen" component={ArtistSigninScreen} />
+            <Stack.Screen name="ArtistForgotPasswordScreen" component={ArtistForgotPasswordScreen} />
+            <Stack.Screen name="ArtistCheckMailbox" component={ArtistCheckMailbox} />
+            <Stack.Screen name="ArtistCreateNewPassword" component={ArtistCreateNewPassword} />
             <Stack.Screen name="OtpVerify" component={OtpVerificationScreen} />
             <Stack.Screen name="ArtistOtpVerificationScreen" component={ArtistOtpVerificationScreen} />
             <Stack.Screen name="ArtistVerifiedScreen" component={ArtistVerifiedScreen} />
@@ -196,7 +206,7 @@ export default function App() {
             <Stack.Screen name="CheckMailBox" component={CheckMailboxScreen} />
             <Stack.Screen name="CreateNewPassword" component={CreateNewPasswordScreen} />
             <Stack.Screen name="UserOtpReset" component={UserOtpResetScreen} />
-            <Stack.Screen name="UserHome" component={UserHomeScreen} />
+            <Stack.Screen name="UserHome" component={UserBottomTabNavigator} />
             <Stack.Screen name="MainTabs" component={BottomTabNavigator} />
             <Stack.Screen name="Notification" component={NotificationScreen} />
             <Stack.Screen name="Explore" component={ExploreEventScreen} />
@@ -242,6 +252,11 @@ export default function App() {
             <Stack.Screen name="HomeScreen" component={HomeScreen} />
             <Stack.Screen name="HostVerifiedScreen" component={HostVerifiedScreen} />
             <Stack.Screen name="HostAddPayment" component={HostAddPayment} />
+            <Stack.Screen name="ForgotPasswordScreen" component={ForgotPasswordScreen} />
+            <Stack.Screen name="HostDiscount" component={HostDiscount} />
+            <Stack.Screen name="UserVerifiedScreen" component={UserVerifiedScreen} />
+            <Stack.Screen name="UserTicketDownload" component={UserTicketDownload} />
+
 
           </Stack.Navigator>
         </NavigationContainer>

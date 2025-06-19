@@ -97,7 +97,7 @@ const HostEditProfileScreen = ({ navigation }) => {
             onPress={() => {
               console.log('Camera button pressed');
             }}>
-            <MaterialIcons name="camera-alt" size={Math.max(dimensions.iconSize * 0.8, 16)} color="#fff" />
+            <MaterialIcons name="camera-alt" size={28} color="#fff" />
           </TouchableOpacity>
         </View>
 
@@ -238,6 +238,8 @@ const styles = StyleSheet.create({
   profileImageContainer: {
     alignItems: 'center',
     marginBottom: dimensions.spacing.xxl,
+    justifyContent: 'center',
+    position: 'relative',
   },
   profileImage: {
     width: dimensions.profileImageSize,
@@ -246,18 +248,25 @@ const styles = StyleSheet.create({
     backgroundColor: '#ddd',
   },
   cameraIconContainer: {
+   
+
+  marginRight:110,
     position: 'absolute',
-    bottom: Math.max(dimensions.spacing.xs, 4),
-    right: Math.max(dimensions.spacing.xs, 4),
-    backgroundColor: '#a95eff',
-    borderRadius: dimensions.borderRadius.lg,
-    padding: dimensions.spacing.sm,
-    borderWidth: 2,
-    borderColor: '#000',
-    minWidth: Math.max(dimensions.iconSize * 1.5, 30),
-    minHeight: Math.max(dimensions.iconSize * 1.5, 30),
+    bottom: 8,
+    right: 8,
+    backgroundColor: '#B15CDE',
+    borderRadius: 32,
+    width: 38,
+    height: 38,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 0,
+    zIndex: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.10,
+    shadowRadius: 6,
+    elevation: 4,
   },
   inputContainer: {
     marginBottom: dimensions.spacing.xl,

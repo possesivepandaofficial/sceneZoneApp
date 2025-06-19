@@ -4,6 +4,8 @@ import Feather from 'react-native-vector-icons/Feather';
 import { useDispatch } from 'react-redux';
 import { logout } from '../Redux/slices/authSlice';
 import HostEditProfileScreen from './HostEditProfile';
+import MaskedView from '@react-native-masked-view/masked-view';
+import LinearGradient from 'react-native-linear-gradient';
 
 const settings = [
   { icon: 'user', label: 'Edit Profile', nav: 'HostEditProfile' },
@@ -36,7 +38,9 @@ const ProfileScreen = ({ navigation }) => {
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <Text style={styles.headerTitle}>Profile</Text>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Profile</Text>
+        </View>
         {/* Profile Card */}
         <View style={styles.profileCard}>
           <Image source={require('../assets/Images/Profile1.png')} style={styles.profileBg} resizeMode="cover" />
@@ -71,7 +75,16 @@ const ProfileScreen = ({ navigation }) => {
         <Text style={styles.versionText}>App version 1.0.0.1</Text>
         {/* Log Out Button - scrolls with content */}
         <TouchableOpacity style={styles.logoutButton} activeOpacity={0.8} onPress={handleLogout}>
-          <Text style={styles.logoutButtonText}>Log Out</Text>
+          <MaskedView maskElement={<Text style={[styles.logoutButtonText, { backgroundColor: 'transparent' }]}>Log Out</Text>}>
+            <LinearGradient
+              colors={["#B15CDE", "#7952FC"]}
+              start={{ x: 1, y: 0 }}
+              end={{ x: 0, y: 0 }}
+              style={{ height: 21 }}
+            >
+              <Text style={[styles.logoutButtonText, { opacity: 0 }]}>Log Out</Text>
+            </LinearGradient>
+          </MaskedView>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
@@ -86,23 +99,41 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#111018',
   },
+  header: {
+    display: 'flex',
+    width: 393,
+    paddingTop: 40,
+    paddingBottom: 20,
+    paddingLeft: 16,
+    paddingRight: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#C6C5ED',
+    backgroundColor: '#121212',
+    shadowColor: '#683BFC',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
+    elevation: 4,
+    justifyContent: 'space-between',
+  },
   headerTitle: {
-    paddingTop: 30,
     color: '#d1cfff',
     fontSize: 22,
     fontWeight: '700',
-    marginTop: 12,
-    marginLeft: 18,
-    marginBottom: 10,
   },
   profileCard: {
-    marginHorizontal: 18,
+    width: '100%',
+    marginHorizontal: 0,
     marginBottom: 18,
-    borderRadius: 24,
+    borderRadius: 16,
     overflow: 'hidden',
     position: 'relative',
     height: 110,
-    marginTop: 6,
+    marginTop: 20,
+    alignSelf: 'center',
   },
   profileBg: {
     position: 'absolute',
@@ -114,7 +145,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     height: 110,
-    paddingHorizontal: 18,
+    paddingHorizontal: 14,
     zIndex: 2,
   },
   avatar: {
@@ -152,9 +183,9 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: '#34344A',
-    paddingVertical: 18,
+    paddingVertical: 8,
     paddingHorizontal: 18,
-    marginBottom: 14,
+    marginBottom: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
@@ -182,9 +213,10 @@ const styles = StyleSheet.create({
   },
   versionText: {
     color: '#44435a',
-    fontSize: 13,
+    fontSize: 12,
     alignSelf: 'center',
     marginVertical: 10,
+    marginTop:-10,
     fontWeight: '400',
   },
   logoutButton: {
@@ -198,7 +230,7 @@ const styles = StyleSheet.create({
   logoutButtonText: {
     color: '#C6C5ED',
     fontFamily: 'Nunito Sans',
-    fontSize: 14,
+    fontSize: 12,
     fontStyle: 'normal',
     fontWeight: '400',
     lineHeight: 21,

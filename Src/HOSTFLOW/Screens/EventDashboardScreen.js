@@ -97,7 +97,12 @@ const EventDashboardScreen = ({ navigation }) => {
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Feather name="arrow-left" size={24} color="#fff" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle} numberOfLines={1} ellipsizeMode="tail">Event Dashboard</Text>
+          <View style={{ flex: 1, alignItems: 'center' }}>
+            <Text style={styles.headerTitle} numberOfLines={1} ellipsizeMode="tail">Event Dashboard</Text>
+          </View>
+          <TouchableOpacity style={styles.discountButton} onPress={() => navigation.navigate('HostDiscount')}>
+            <Text style={styles.discountButtonText}>Discounts</Text>
+          </TouchableOpacity>
         </View>
 
         <ScrollView contentContainerStyle={styles.scrollViewContent}> 
@@ -209,7 +214,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     lineHeight: 24,
-    paddingRight:230,
     overflow: 'hidden',
   },
   scrollViewContent: {
@@ -375,6 +379,24 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 12,
     fontWeight: '600',
+  },
+  discountButton: {
+  marginRight:50,
+    display: 'flex',
+    height: 32,
+    paddingHorizontal: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 6,
+    borderRadius: 10,
+    backgroundColor: '#B15CDE',
+    marginLeft: 12,
+  },
+  discountButtonText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '400',
   },
 });
 

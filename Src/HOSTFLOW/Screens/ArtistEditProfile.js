@@ -13,6 +13,7 @@ import Icon from 'react-native-vector-icons/Feather';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
+import CustomToggle from '../Components/CustomToggle';
 
 const { width, height } = Dimensions.get('window');
 const isSmallPhone = width < 350;
@@ -38,10 +39,18 @@ const ArtistEditProfileScreen = ({ navigation }) => {
   const [instrument, setInstrument] = useState('Guitar');
   const [budget, setBudget] = useState('500k');
   const [phoneNumber, setPhoneNumber] = useState('412-123-4215');
+  const [crowdGuarantee, setCrowdGuarantee] = useState(false);
   const insets = useSafeAreaInsets();
 
   return (
     <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>  
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerBackButton}>
+          <Icon name="arrow-left" size={20} color="#C6C5ED" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Edit Profile</Text>
+        <View style={{ width: 20 }} />
+      </View>
       <ScrollView 
         contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 50 }]}
         showsVerticalScrollIndicator={false}
@@ -154,6 +163,13 @@ const ArtistEditProfileScreen = ({ navigation }) => {
             keyboardType="phone-pad"
           />
         </View>
+        <View style={styles.crowdGuaranteeRow}>
+          <Text style={styles.crowdGuaranteeLabel}>Crowd Guarantee</Text>
+          <CustomToggle
+            value={crowdGuarantee}
+            onValueChange={setCrowdGuarantee}
+          />
+        </View>
 
         <View style={styles.galleryHeader}>
           <Text style={styles.label}>Performance Gallery</Text>
@@ -182,7 +198,7 @@ const ArtistEditProfileScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={styles.uploadButton}>
+        <TouchableOpacity style={styles.uploadButton} onPress={() => navigation.navigate('ArtistUpload')}>
           <Text style={styles.uploadButtonText}>Upload</Text>
           <Icon name="upload" size={20} color="#fff" style={{marginLeft: 5}} />
         </TouchableOpacity>
@@ -205,7 +221,33 @@ const ArtistEditProfileScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#121212',
+    
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: 393,
+    paddingVertical: 20,
+    paddingHorizontal: 16,
+    gap: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#C6C5ED',
+    backgroundColor: '#121212',
+    alignSelf: 'center',
+  },
+  headerBackButton: {
+    padding: 4,
+    marginRight: 8,
+  },
+  headerTitle: {
+    color: '#C6C5ED',
+    fontSize: 16,
+    fontWeight: '600',
+    fontFamily: 'Nunito Sans',
+    flex: 1,
+    textAlign: 'left',
+    
   },
   scrollContent: {
     padding: 20,
@@ -341,6 +383,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#a95eff',
+  },
+  crowdGuaranteeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 8,
+    marginBottom: 8,
+    paddingHorizontal: 4,
+  },
+  crowdGuaranteeLabel: {
+    fontWeight: 'bold',
+    color: '#fff',
+    fontSize: 15,
+    fontFamily: 'Nunito Sans',
   },
 });
 
