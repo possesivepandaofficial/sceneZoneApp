@@ -159,6 +159,9 @@ export default function App() {
                 animationDuration: 300,
               }}
             />
+
+
+            
             <Stack.Screen 
               name="Signup" 
               component={SignUpScreen}
