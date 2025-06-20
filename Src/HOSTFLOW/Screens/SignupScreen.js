@@ -86,7 +86,7 @@ const SignUpScreen = ({ navigation }) => {
 
       const response = await api.post('/host/auth/signup', signupData);
 
-      console.log("API Response host:", response.data); // Debug: Log API response
+      console.log("API Response host:", response.data); 
 
       if (response.data) {
         // Store user data in Redux with all required fields

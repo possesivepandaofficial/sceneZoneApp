@@ -1,3 +1,5 @@
+
+
 import React, { useState } from 'react';
 import {
   View,
@@ -10,9 +12,11 @@ import {
   Dimensions,
   Switch,
   ScrollView,
+  Alert,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/Ionicons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import GoogleIcon from '../assets/icons/Google';
 import AppleIcon from '../assets/icons/Apple';
 import SignUpBackground from '../assets/Banners/SignUp';
@@ -21,12 +25,17 @@ import FullNameIcon from '../assets/icons/fullname';
 import MobileIcon from '../assets/icons/mobile';
 import LocationIcon from '../assets/icons/location';
 import LockIcon from '../assets/icons/lock';
+import api from '../Config/api';
+import { useDispatch } from 'react-redux';
+import { loginHost } from '../Redux/slices/authSlice';
 
 const { width, height } = Dimensions.get('window');
 
 const UserSignupScreen = ({ navigation }) => {
+  const dispatch = useDispatch();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
+
   const insets = useSafeAreaInsets();
 
   // Responsive padding based on screen size
@@ -39,13 +48,89 @@ const UserSignupScreen = ({ navigation }) => {
 
   const [fullName, setFullName] = useState('');
   const [mobile, setMobile] = useState('');
-  const [location, setLocation] = useState('');
+  // const [location, setLocation] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSignUp = () => {
-    navigation.navigate('UserSignin');
+  const handleSignUp = async () => {
+    console.log("Sign Up button pressed"); // Debug: Confirm button press
+
+    // Input validation
+    if (!fullName.trim()) {
+      Alert.alert('Error', 'Please enter your full name');
+      return;
+    }
+
+    if (!mobile.trim() || isNaN(mobile) || mobile.length < 10) {
+      Alert.alert('Error', 'Please enter a valid mobile number (at least 10 digits)');
+      return;
+    }
+
+    if (!password.trim()) {
+      Alert.alert('Error', 'Please enter a password');
+      return;
+    }
+
+    const signupData = {
+      fullName: fullName.trim(),
+      mobileNumber: parseInt(mobile),
+      password: password.trim(),
+      isRemember: rememberMe,
+      // location: location.trim(),
+    };
+
+    console.log("Signup Data:", signupData); 
+
+    try {
+      setIsLoading(true);
+
+      const response = await api.post('/user/auth/signup', signupData);
+
+      console.log("API Response host:", response.data); 
+
+      if (response.data) {
+        // Store user data in Redux with all required fields
+        dispatch(loginHost({
+          id: response.data.data?.id || 'host123',
+          name: fullName.trim(),
+          fullName: fullName.trim(),
+          email: response.data.data?.email || '',
+          phone: mobile,
+          mobileNumber: parseInt(mobile),
+         
+          role: 'user',
+          token: response.data.data?.token || null
+        }));
+
+        // Log the Redux state after dispatch
+        console.log("User data stored in Redux:", {
+          fullName: fullName.trim(),
+          mobileNumber: parseInt(mobile),
+          // location: location.trim(),
+          role: 'user'
+        });
+
+        Alert.alert('Success', 'Account created successfully!', [
+          { 
+            text: 'OK', 
+            onPress: () => navigation.navigate('UserOtpVerification', { 
+              mobileNumber: mobile
+            }) 
+          },
+        ]);
+      }
+    } catch (error) {
+      console.error("Signup Error:", error.message);
+      console.error("Error Response:", error.response?.data);
+      Alert.alert(
+        'Error',
+        error.response?.data?.message || 'Failed to sign up. Please check your network or try again later.'
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -54,7 +139,7 @@ const UserSignupScreen = ({ navigation }) => {
       paddingBottom: insets.bottom,
       paddingLeft: insets.left,
       paddingRight: insets.right,
-    }]}> 
+    }]}>
       <SignUpBackground 
         style={styles.backgroundSvg}
         width={width}
@@ -66,7 +151,9 @@ const UserSignupScreen = ({ navigation }) => {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <Text style={[styles.header, { color: '#fff' }]}>Create new{"\n"}user account</Text>
+          <Text style={[styles.header, { color: '#fff' }]}>
+            Create new {'\n'} user account
+          </Text>
 
           <Text style={styles.signinText}>
             Already have an account?{' '}
@@ -97,21 +184,10 @@ const UserSignupScreen = ({ navigation }) => {
               placeholderTextColor="#aaa"
               keyboardType="phone-pad"
               value={mobile}
-              onChangeText={setMobile}
-            />
+              onChangeText={setMobile}/>
           </View>
 
-          <View style={styles.inputContainer}>
-            <LocationIcon width={20} height={20} style={styles.icon} />
-            <TextInput
-              style={[styles.input, { color: '#fff' }]}
-              placeholder="Location"
-              placeholderTextColor="#aaa"
-              value={location}
-              onChangeText={setLocation}
-            />
-          </View>
-
+         
           <View style={[styles.inputContainer, styles.passwordContainer]}>
             <LockIcon width={20} height={20} style={styles.icon} />
             <TextInput
@@ -136,30 +212,33 @@ const UserSignupScreen = ({ navigation }) => {
             <Text style={{ color: '#fff' }}> Remember me</Text>
           </View>
 
-          <TouchableOpacity onPress={handleSignUp}>
+          <TouchableOpacity onPress={handleSignUp} disabled={isLoading}>
             <LinearGradient 
               colors={['#B15CDE', '#7952FC']} 
               start={{x: 1, y: 0}}
               end={{x: 0, y: 0}}
-              style={styles.signupButton}
+              style={[styles.signupButton, isLoading && { opacity: 0.7 }]}
             >
-              <Text style={styles.signupButtonText}>Sign Up</Text>
+              <Text style={styles.signupButtonText}>
+                {isLoading ? 'Signing Up...' : 'Sign Up'}
+              </Text>
             </LinearGradient>
           </TouchableOpacity>
 
           <Text style={[styles.orText, { color: '#ccc' }]}>or sign up with</Text>
 
-          <TouchableOpacity style={[styles.socialButton, { backgroundColor: '#000' }]}> 
+          <TouchableOpacity style={[styles.socialButton, { backgroundColor: '#000' }]}>
             <GoogleIcon style={styles.socialIcon} width={24} height={24} />
             <Text style={styles.socialButtonText}>Sign up with Google</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.socialButton, { backgroundColor: '#000' }]}> 
+          <TouchableOpacity style={[styles.socialButton, { backgroundColor: '#000' }]}>
             <AppleIcon style={styles.socialIcon} width={24} height={24} />
             <Text style={styles.socialButtonText}>Sign up with Apple</Text>
           </TouchableOpacity>
 
-          <Text style={[styles.termsText, { color: '#aaa' }]}>By clicking "Sign Up" you agree to Recognotes{' '}
+          <Text style={[styles.termsText, { color: '#aaa' }]}>
+            By clicking "Sign Up" you agree to Recognotes{' '}
             <Text style={styles.linkText}>Term of Use</Text> and{' '}
             <Text style={styles.linkText}>Privacy Policy</Text>
           </Text>
@@ -269,7 +348,7 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 1)',
   },
   orText: {
-    fontSize:11,
+    fontSize: 11,
     textAlign: 'center',
     marginBottom: 25,
   },
@@ -313,4 +392,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default UserSignupScreen; 
+export default UserSignupScreen;

@@ -116,27 +116,27 @@ export default function App() {
   const [showSplash, setShowSplash] = React.useState(true);
   const navigationRef = React.useRef();
 
-  React.useEffect(() => {
-    const handleAppStateChange = (nextAppState) => {
-      if (nextAppState === 'background' || nextAppState === 'inactive') {
-        setIsAppInBackground(true);
-      } else if (nextAppState === 'active' && isAppInBackground) {
-        // App came to foreground, show splash screen
-        setShowSplash(true);
-        setIsAppInBackground(false);
-        // Reset navigation to splash screen
-        if (navigationRef.current) {
-          navigationRef.current.reset({
-            index: 0,
-            routes: [{ name: 'Splash' }],
-          });
-        }
-      }
-    };
+  // React.useEffect(() => {
+  //   const handleAppStateChange = (nextAppState) => {
+  //     if (nextAppState === 'background' || nextAppState === 'inactive') {
+  //       setIsAppInBackground(true);
+  //     } else if (nextAppState === 'active' && isAppInBackground) {
+  //       // App came to foreground, show splash screen
+  //       setShowSplash(true);
+  //       setIsAppInBackground(false);
+  //       // Reset navigation to splash screen
+  //       if (navigationRef.current) {
+  //         navigationRef.current.reset({
+  //           index: 0,
+  //           routes: [{ name: 'Splash' }],
+  //         });
+  //       }
+  //     }
+  //   };
 
-    const subscription = AppState.addEventListener('change', handleAppStateChange);
-    return () => subscription?.remove();
-  }, [isAppInBackground]);
+  //   const subscription = AppState.addEventListener('change', handleAppStateChange);
+  //   return () => subscription?.remove();
+  // }, [isAppInBackground]);
 
   return (
     <Provider store={store}>
@@ -250,12 +250,10 @@ export default function App() {
             <Stack.Screen name="HomeScreen" component={HomeScreen} />
             <Stack.Screen name="HostVerifiedScreen" component={HostVerifiedScreen} />
             <Stack.Screen name="HostAddPayment" component={HostAddPayment} />
-            <Stack.Screen name="ForgotPasswordScreen" component={ForgotPasswordScreen} />            <Stack.Screen name="ForgotPasswordScreen" component={ForgotPasswordScreen} />
+            <Stack.Screen name="ForgotPasswordScreen" component={ForgotPasswordScreen} />  
             <Stack.Screen name="HostDiscount" component={HostDiscount} />
             <Stack.Screen name="UserVerifiedScreen" component={UserVerifiedScreen} />
             <Stack.Screen name="UserTicketDownload" component={UserTicketDownload} />
-
-
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaProvider>
