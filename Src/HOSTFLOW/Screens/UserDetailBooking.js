@@ -59,15 +59,15 @@ const UserDetailBookingScreen = ({ navigation, route }) => {
     // Implement booking confirmation logic here
     console.log("Confirming booking");
     // Navigate to the ticket download screen
-    // navigation.navigate("UserTicketDownload", {
-    //   bookingDetails: {
-    //     numberOfTickets,
-    //     selectedGuestType,
-    //     eventDetails,
-    //     totalAmount,
-    //     ticketId,
-    //   },
-    // });
+    navigation.navigate("UserTicketDownload", {
+      bookingDetails: {
+        numberOfTickets,
+        selectedGuestType,
+        eventDetails,
+        totalAmount,
+        ticketId,
+      },
+    });
   };
 
   return (
