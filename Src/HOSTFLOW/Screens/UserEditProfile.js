@@ -1,7 +1,4 @@
-
-
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -15,17 +12,21 @@ import {
   Dimensions,
   Alert,
   ActivityIndicator,
-} from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import LinearGradient from 'react-native-linear-gradient';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectToken, selectUserData, loginUser } from '../Redux/slices/authSlice';
-import api from '../Config/api';
-import * as ImagePicker from 'react-native-image-picker';
+} from "react-native";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import LinearGradient from "react-native-linear-gradient";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  selectToken,
+  selectUserData,
+  loginUser,
+} from "../Redux/slices/authSlice";
+import api from "../Config/api";
+import * as ImagePicker from "react-native-image-picker";
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 
 const dimensions = {
   spacing: {
@@ -58,51 +59,63 @@ const UserEditProfileScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const token = useSelector(selectToken);
   const userData = useSelector(selectUserData);
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [location, setLocation] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [location, setLocation] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [profileImage, setProfileImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const insets = useSafeAreaInsets();
 
+  console.log("UserEditProfileScreen mounted", userData);
+
   useEffect(() => {
     if (!token) {
-      Alert.alert('Error', 'Session expired. Please log in again.');
-      navigation.navigate('UserSignin');
+      Alert.alert("Error", "Session expired. Please log in again.");
+      navigation.navigate("UserSignin");
       return;
     }
-    setFullName(userData?.fullName || userData?.name || '');
-    setEmail(userData?.email || '');
-    setLocation(userData?.location || '');
-    setPhoneNumber(userData?.mobileNumber ? String(userData.mobileNumber) : '');
-    setProfileImage(userData?.profileImageUrl ? { uri: userData.profileImageUrl } : null);
+    setFullName(userData?.fullName || userData?.name || "");
+    setEmail(userData?.email || "");
+    setLocation(userData?.address || userData?.location || "");
+    setPhoneNumber(userData?.mobileNumber ? String(userData.mobileNumber) : "");
+    setProfileImage(
+      userData?.profileImageUrl ? { uri: userData.profileImageUrl } : null
+    );
     fetchProfileData();
-  }, [userData, token, navigation]);
+  }, [token]);
 
   const fetchProfileData = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/api/user/get-profile', {
+      const response = await api.get("/user/get-profile", {
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
 
-      if (response.data.success) {
-        const data = response.data.data;
-        setFullName(data.fullName || data.name || '');
-        setEmail(data.email || '');
-        setLocation(data.location || '');
-        setPhoneNumber(data.mobileNumber ? String(data.mobileNumber) : '');
-        setProfileImage(data.profileImageUrl ? { uri: data.profileImageUrl } : null);
+      if (response?.data?.success) {
+        const data = response?.data?.data;
+        setFullName(data.fullName || data.name || "");
+        setEmail(data.email || "");
+        setLocation(data.address || data.location || "");
+        setPhoneNumber(data.mobileNumber ? String(data.mobileNumber) : "");
+        setProfileImage(
+          data?.profileImageUrl ? { uri: data.profileImageUrl } : null
+        );
       } else {
-        Alert.alert('Error', response.data.message || 'Failed to fetch profile data');
+        Alert.alert(
+          "Error",
+          response.data.message || "Failed to fetch profile data"
+        );
       }
     } catch (error) {
-      console.error('Error fetching profile:', error);
-      Alert.alert('Error', error.response?.data?.message || 'Failed to fetch profile data');
+      console.error("Error fetching profile:", error);
+      Alert.alert(
+        "Error",
+        error.response?.data?.message || "Failed to fetch profile data"
+      );
     } finally {
       setLoading(false);
     }
@@ -110,15 +123,15 @@ const UserEditProfileScreen = ({ navigation }) => {
 
   const validateInputs = () => {
     if (!fullName.trim()) {
-      Alert.alert('Error', 'Full name is required');
+      Alert.alert("Error", "Full name is required");
       return false;
     }
     if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      Alert.alert('Error', 'Please enter a valid email address');
+      Alert.alert("Error", "Please enter a valid email address");
       return false;
     }
     if (phoneNumber && !/^\d{10}$/.test(phoneNumber)) {
-      Alert.alert('Error', 'Please enter a valid 10-digit phone number');
+      Alert.alert("Error", "Please enter a valid 10-digit phone number");
       return false;
     }
     return true;
@@ -127,35 +140,38 @@ const UserEditProfileScreen = ({ navigation }) => {
   const validateImage = (image) => {
     const maxSize = 5 * 1024 * 1024; // 5MB
     if (image.fileSize > maxSize) {
-      Alert.alert('Error', 'Image size must be less than 5MB');
+      Alert.alert("Error", "Image size must be less than 5MB");
       return false;
     }
-    if (!['image/jpeg', 'image/png'].includes(image.type)) {
-      Alert.alert('Error', 'Only JPEG and PNG images are supported');
+    if (!["image/jpeg", "image/png"].includes(image.type)) {
+      Alert.alert("Error", "Only JPEG and PNG images are supported");
       return false;
     }
     return true;
   };
 
   const handleImagePicker = () => {
-    Alert.alert('Choose Image Source', 'Select image from', [
-      { text: 'Camera', onPress: launchCamera },
-      { text: 'Gallery', onPress: launchGallery },
-      { text: 'Cancel', style: 'cancel' },
+    Alert.alert("Choose Image Source", "Select image from", [
+      { text: "Camera", onPress: launchCamera },
+      { text: "Gallery", onPress: launchGallery },
+      { text: "Cancel", style: "cancel" },
     ]);
   };
 
   const launchCamera = () => {
     ImagePicker.launchCamera(
       {
-        mediaType: 'photo',
+        mediaType: "photo",
         quality: 0.8,
         includeBase64: false, // Removed includeBase64 to reduce memory usage
       },
       (response) => {
         if (response.didCancel) return;
         if (response.errorCode) {
-          Alert.alert('Error', response.errorMessage || 'Failed to capture image');
+          Alert.alert(
+            "Error",
+            response.errorMessage || "Failed to capture image"
+          );
           return;
         }
         if (validateImage(response.assets[0])) {
@@ -168,14 +184,17 @@ const UserEditProfileScreen = ({ navigation }) => {
   const launchGallery = () => {
     ImagePicker.launchImageLibrary(
       {
-        mediaType: 'photo',
+        mediaType: "photo",
         quality: 0.8,
         includeBase64: false, // Removed includeBase64 to reduce memory usage
       },
       (response) => {
         if (response.didCancel) return;
         if (response.errorCode) {
-          Alert.alert('Error', response.errorMessage || 'Failed to select image');
+          Alert.alert(
+            "Error",
+            response.errorMessage || "Failed to select image"
+          );
           return;
         }
         if (validateImage(response.assets[0])) {
@@ -189,38 +208,47 @@ const UserEditProfileScreen = ({ navigation }) => {
     if (!validateInputs()) return;
 
     // Store previous data outside try block
-    const previousData = { fullName, email, location, phoneNumber, profileImage };
+    const previousData = {
+      fullName,
+      email,
+      location,
+      phoneNumber,
+      profileImage,
+    };
 
     try {
       setLoading(true);
 
       const formData = new FormData();
-      formData.append('fullName', fullName);
-      formData.append('email', email);
-      formData.append('location', location);
-      formData.append('mobileNumber', phoneNumber);
+      formData.append("fullName", fullName);
+      formData.append("email", email);
+      formData.append("address", location);
+      formData.append("mobileNumber", phoneNumber);
 
-      if (profileImage && profileImage.uri && !profileImage.uri.startsWith('http')) {
+      if (
+        profileImage &&
+        profileImage.uri &&
+        !profileImage.uri.startsWith("http")
+      ) {
         if (!validateImage(profileImage)) {
           setLoading(false);
           return;
         }
-        formData.append('profileImage', {
+        formData.append("profileImageUrl", {
           uri: profileImage.uri,
-          type: profileImage.type || 'image/jpeg',
-          name: profileImage.fileName || 'profile.jpg',
+          type: profileImage.type || "image/jpeg",
+          name: profileImage.fileName || "profile.jpg",
         });
       }
 
-      const response = await api.patch('/user/update-profile', formData, {
+      const response = await api.patch("/user/update-profile", formData, {
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
       });
 
       if (response.data.success) {
-        // Update Redux state with new profile data
         dispatch(
           loginUser({
             id: userData?.id || response.data.data?._id,
@@ -229,20 +257,21 @@ const UserEditProfileScreen = ({ navigation }) => {
             email: email,
             phone: phoneNumber,
             mobileNumber: phoneNumber,
-            location: location,
+            address: location,
             role: userData?.role,
-            // token: token,
-            profileImageUrl: response.data.data?.profileImageUrl || userData?.profileImageUrl,
+            profileImageUrl:
+              response.data.data?.profileImageUrl || userData?.profileImageUrl,
+            token: token,
           })
         );
 
-        Alert.alert('Success', 'Profile updated successfully');
-        navigation.navigate('MainTabs');
+        Alert.alert("Success", "Profile updated successfully");
+        navigation.navigate("UserProfileScreen");
       } else {
-        throw new Error(response.data.message || 'Failed to update profile');
+        throw new Error(response.data.message || "Failed to update profile");
       }
     } catch (error) {
-      console.error('Error updating profile:', error);
+      console.error("Error updating profile:", error);
       // Revert to previous data
       setFullName(previousData.fullName);
       setEmail(previousData.email);
@@ -250,20 +279,20 @@ const UserEditProfileScreen = ({ navigation }) => {
       setPhoneNumber(previousData.phoneNumber);
       setProfileImage(previousData.profileImage);
 
-      let errorMessage = 'Failed to update profile';
+      let errorMessage = "Failed to update profile";
       if (error.response) {
         if (error.response.status === 401) {
-          errorMessage = 'Session expired. Please log in again.';
-          navigation.navigate('UserSignin');
+          errorMessage = "Session expired. Please log in again.";
+          navigation.navigate("UserSignin");
         } else if (error.response.status === 413) {
-          errorMessage = 'Image size too large. Please choose a smaller image.';
+          errorMessage = "Image size too large. Please choose a smaller image.";
         } else {
           errorMessage = error.response.data?.message || errorMessage;
         }
       } else {
         errorMessage = error.message || errorMessage;
       }
-      Alert.alert('Error', errorMessage);
+      Alert.alert("Error", errorMessage);
     } finally {
       setLoading(false);
     }
@@ -271,7 +300,12 @@ const UserEditProfileScreen = ({ navigation }) => {
 
   if (loading && !fullName) {
     return (
-      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+      <View
+        style={[
+          styles.container,
+          { justifyContent: "center", alignItems: "center" },
+        ]}
+      >
         <ActivityIndicator size="large" color="#a95eff" />
       </View>
     );
@@ -288,7 +322,10 @@ const UserEditProfileScreen = ({ navigation }) => {
           },
         ]}
       >
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
           <Ionicons name="arrow-back" size={dimensions.iconSize} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Edit Profile</Text>
@@ -314,17 +351,24 @@ const UserEditProfileScreen = ({ navigation }) => {
           ]}
         >
           <Image
-            source={profileImage ? { uri: profileImage.uri } : require('../assets/Images/frame1.png')}
+            source={
+              profileImage
+                ? { uri: profileImage.uri }
+                : require("../assets/Images/frame1.png")
+            }
             style={styles.profileImage}
           />
-          <TouchableOpacity style={styles.cameraIconContainer} onPress={handleImagePicker}>
+          <TouchableOpacity
+            style={styles.cameraIconContainer}
+            onPress={handleImagePicker}
+          >
             <MaterialIcons name="camera-alt" size={28} color="#fff" />
           </TouchableOpacity>
         </View>
 
         {/* Input Fields */}
         <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>Full name</Text>
+          <Text style={styles.inputLabel}>Full name </Text>
           <TextInput
             style={styles.input}
             value={fullName}
@@ -337,7 +381,7 @@ const UserEditProfileScreen = ({ navigation }) => {
         <View style={styles.inputContainer}>
           <Text style={styles.inputLabel}>Email</Text>
           <TextInput
-            style={[styles.input, { borderColor: '#24242D' }]}
+            style={[styles.input, { borderColor: "#24242D" }]}
             value={email}
             onChangeText={setEmail}
             placeholder="Email"
@@ -350,7 +394,7 @@ const UserEditProfileScreen = ({ navigation }) => {
         <View style={styles.inputContainer}>
           <Text style={styles.inputLabel}>Location</Text>
           <TextInput
-            style={[styles.input, { borderColor: '#24242D' }]}
+            style={[styles.input, { borderColor: "#24242D" }]}
             value={location}
             onChangeText={setLocation}
             placeholder="Location"
@@ -364,7 +408,11 @@ const UserEditProfileScreen = ({ navigation }) => {
           <View style={styles.phoneInputContainer}>
             <View style={styles.countryCodePicker}>
               <Text style={styles.countryCodeText}>+91</Text>
-              <MaterialIcons name="keyboard-arrow-down" size={dimensions.iconSize} color="#fff" />
+              <MaterialIcons
+                name="keyboard-arrow-down"
+                size={dimensions.iconSize}
+                color="#fff"
+              />
             </View>
             <TextInput
               style={styles.phoneInput}
@@ -391,17 +439,17 @@ const UserEditProfileScreen = ({ navigation }) => {
         disabled={loading}
       >
         <LinearGradient
-          colors={['#B15CDE', '#7952FC']}
+          colors={["#B15CDE", "#7952FC"]}
           start={{ x: 1, y: 0 }}
           end={{ x: 0, y: 0 }}
           style={{
             flex: 1,
-            width: '100%',
-            height: '100%',
-            justifyContent: 'center',
-            alignItems: 'center',
+            width: "100%",
+            height: "100%",
+            justifyContent: "center",
+            alignItems: "center",
             borderRadius: 14,
-            flexDirection: 'row',
+            flexDirection: "row",
             gap: 10,
           }}
         >
@@ -419,20 +467,20 @@ const UserEditProfileScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#121212',
+    backgroundColor: "#121212",
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     width: 393,
-    alignSelf: 'center',
+    alignSelf: "center",
     paddingVertical: 20,
     paddingHorizontal: 16,
-    backgroundColor: '#121212',
+    backgroundColor: "#121212",
     borderBottomWidth: 1,
-    borderBottomColor: '#C6C5ED',
-    shadowColor: 'rgba(104, 59, 252, 0.05)',
+    borderBottomColor: "#C6C5ED",
+    shadowColor: "rgba(104, 59, 252, 0.05)",
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 1,
     shadowRadius: 12,
@@ -443,16 +491,16 @@ const styles = StyleSheet.create({
     borderRadius: dimensions.borderRadius.md,
     minWidth: dimensions.iconSize + 8,
     minHeight: dimensions.iconSize + 8,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   headerTitle: {
     fontSize: dimensions.fontSize.header,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontWeight: "bold",
+    color: "#fff",
     marginLeft: 16,
     flex: 1,
-    textAlign: 'center',
+    textAlign: "center",
     marginRight: 170,
   },
   scrollViewContent: {
@@ -460,31 +508,31 @@ const styles = StyleSheet.create({
     paddingTop: dimensions.spacing.xl,
   },
   profileImageContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: dimensions.spacing.xxl,
-    justifyContent: 'center',
-    position: 'relative',
+    justifyContent: "center",
+    position: "relative",
   },
   profileImage: {
     width: dimensions.profileImageSize,
     height: dimensions.profileImageSize,
     borderRadius: dimensions.profileImageSize / 2,
-    backgroundColor: '#ddd',
+    backgroundColor: "#ddd",
   },
   cameraIconContainer: {
     marginRight: 110,
-    position: 'absolute',
+    position: "absolute",
     bottom: 8,
     right: 8,
-    backgroundColor: '#B15CDE',
+    backgroundColor: "#B15CDE",
     borderRadius: 32,
     width: 38,
     height: 38,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     borderWidth: 0,
     zIndex: 2,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 6,
@@ -494,11 +542,11 @@ const styles = StyleSheet.create({
     marginBottom: dimensions.spacing.xl,
   },
   inputLabel: {
-    color: '#7A7A90',
-    fontFamily: 'Nunito Sans',
+    color: "#7A7A90",
+    fontFamily: "Nunito Sans",
     fontSize: 12,
-    fontStyle: 'normal',
-    fontWeight: '400',
+    fontStyle: "normal",
+    fontWeight: "400",
     lineHeight: 18,
     marginBottom: dimensions.spacing.sm,
   },
@@ -507,59 +555,58 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#8D6BFC',
-    backgroundColor: '#121212',
-    color: '#fff',
+    borderColor: "#8D6BFC",
+    backgroundColor: "#121212",
+    color: "#fff",
     fontSize: dimensions.fontSize.title,
   },
   phoneInputContainer: {
-    flexDirection: 'row',
-    backgroundColor: '#1a1a1a',
+    flexDirection: "row",
+    backgroundColor: "#1a1a1a",
     borderRadius: dimensions.borderRadius.md,
-    alignItems: 'center',
+    alignItems: "center",
     minHeight: dimensions.inputHeight,
   },
   countryCodePicker: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: dimensions.spacing.lg,
     borderRightWidth: 1,
-    borderColor: '#333',
+    borderColor: "#333",
     paddingVertical: Math.max(dimensions.spacing.md, 12),
     minHeight: dimensions.inputHeight,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   countryCodeText: {
-    color: '#fff',
+    color: "#fff",
     marginRight: dimensions.spacing.xs,
     fontSize: dimensions.fontSize.title,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   phoneInput: {
     flex: 1,
-    color: '#fff',
+    color: "#fff",
     paddingVertical: Math.max(dimensions.spacing.md, 12),
     paddingHorizontal: dimensions.spacing.lg,
     fontSize: dimensions.fontSize.title,
     minHeight: dimensions.inputHeight,
   },
   saveButton: {
-    width: '90%',
+    width: "90%",
     maxWidth: 361,
     height: 52,
     borderRadius: 14,
-    overflow: 'hidden',
-    alignSelf: 'center',
+    overflow: "hidden",
+    alignSelf: "center",
     marginTop: dimensions.spacing.xl,
   },
   saveButtonText: {
-    color: '#FFF',
-    textAlign: 'center',
-    fontFamily: 'Nunito Sans',
+    color: "#FFF",
+    textAlign: "center",
+    fontFamily: "Nunito Sans",
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
     lineHeight: 21,
   },
 });
-
 export default UserEditProfileScreen;

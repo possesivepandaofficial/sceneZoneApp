@@ -19,7 +19,7 @@ const UserHelpCentreScreen = ({ navigation }) => {
       {/* Header */}
       <View style={[
         styles.header,
-        {
+        { 
           paddingTop: Math.max(insets.top, 20),
         }
       ]}>
@@ -69,12 +69,12 @@ const styles = StyleSheet.create({
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1a1a1a', // Dark background
+    backgroundColor: '#1a1a1a', 
     paddingVertical: 15,
     paddingHorizontal: 15,
     borderRadius: 10,
     marginBottom: 10,
-    justifyContent: 'space-between', // To push the arrow to the right
+    justifyContent: 'space-between', 
   },
   menuItemText: {
     fontSize: 16,

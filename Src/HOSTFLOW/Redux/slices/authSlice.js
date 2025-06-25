@@ -82,16 +82,21 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   isLoggedIn: false,
   userType: null, // 'user', 'host', 'artist'
+  
+  
   userData: {
-    id: null,
-    name: null,
-    email: null,
-    phone: null,
-    location: null,
-    role: null,
-    mobileNumber: null,
-    fullName: null,
-  },
+  id: null,
+  name: null,
+  email: null,
+  phone: null,
+  location: null,
+  role: null,
+  mobileNumber: null,
+  fullName: null,
+  dob: null, // Add this
+  profileImageUrl: null, // Add this
+},
+
   token: null,
 };
 

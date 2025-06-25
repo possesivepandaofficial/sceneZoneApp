@@ -27,7 +27,7 @@ import LocationIcon from '../assets/icons/location';
 import LockIcon from '../assets/icons/lock';
 import api from '../Config/api';
 import { useDispatch } from 'react-redux';
-import { loginHost } from '../Redux/slices/authSlice';
+import { loginHost, loginUser } from '../Redux/slices/authSlice';
 
 const { width, height } = Dimensions.get('window');
 
@@ -88,20 +88,19 @@ const UserSignupScreen = ({ navigation }) => {
 
       const response = await api.post('/user/auth/signup', signupData);
 
-      console.log("API Response host:", response.data); 
+      console.log("API Response user:", response.data); 
 
       if (response.data) {
         // Store user data in Redux with all required fields
-        dispatch(loginHost({
-          id: response.data.data?.id || 'host123',
-          name: fullName.trim(),
-          fullName: fullName.trim(),
-          email: response.data.data?.email || '',
-          phone: mobile,
-          mobileNumber: parseInt(mobile),
-         
-          role: 'user',
-          token: response.data.data?.token || null
+        dispatch(loginUser({
+          // id: response.data.data?.id || '',
+          // name: fullName.trim(),
+          // fullName: fullName.trim(),
+          // email: response.data.data?.email || '',
+          // phone: mobile,
+          // mobileNumber: parseInt(mobile),
+          // role: 'user',
+          // token: response.data.data?.token || null
         }));
 
         // Log the Redux state after dispatch

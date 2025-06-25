@@ -16,6 +16,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
 import SignUpBackground from '../assets/Banners/SignUp';
 import ForgotIcon from '../assets/icons/forgot';
+import api from '../Config/api';
 
 const { width, height } = Dimensions.get('window');
 
@@ -23,12 +24,32 @@ const UserForgotPasswordScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const insets = useSafeAreaInsets();
 
-  const handleConfirm = () => {
-    // Handle confirm logic here, e.g., send OTP
-    console.log('Confirm pressed for email:', email);
-    // Navigate to OTP verification screen for reset
-    navigation.navigate('UserOtpReset'); // Navigate to the new OTP reset screen
-  };
+const handleConfirm = async () => {
+  if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    alert('Please enter a valid email address');
+    return;
+  }
+
+  try {
+    const response = await api.post('/user/email-sendOtp', { email });
+
+    console.log('OTP response:', response.data);
+
+    if (response?.data?.success) {
+      alert('OTP sent to your email');
+      // Optionally pass the email to the OTP screen
+     navigation.navigate('UserOtpReset', { email });
+    } else {
+      alert(response.data.message || 'Failed to send OTP');
+    }
+  } catch (error) {
+    console.error('Error sending OTP:', error);
+    const message =
+      error.response?.data?.message || 'Something went wrong. Please try again.';
+    alert(message);
+  }
+};
+
 
   return (
     <View style={styles.container}>

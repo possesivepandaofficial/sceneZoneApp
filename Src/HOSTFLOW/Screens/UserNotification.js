@@ -12,7 +12,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 const notificationsToday = [
   {
     id: '1',
-    title: 'Event Booked Successfully',
+    title: 'Event Booked Successfully for WJNC #9',
     description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididu...',
     date: '25 Oct 2024',
     time: '11:31 AM',
@@ -85,7 +85,7 @@ const UserNotificationScreen = ({ navigation }) => {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Today's Notifications */}
+      
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>TODAY</Text>
           <TouchableOpacity>
@@ -96,7 +96,6 @@ const UserNotificationScreen = ({ navigation }) => {
           <NotificationItem key={notification.id} {...notification} />
         ))}
 
-        {/* Yesterday's Notifications */}
          <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>YESTERDAY</Text>
           <TouchableOpacity>

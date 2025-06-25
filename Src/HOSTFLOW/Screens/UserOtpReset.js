@@ -15,10 +15,17 @@ import Ionicons from 'react-native-vector-icons/Ionicons'; // For central icon
 import LinearGradient from 'react-native-linear-gradient';
 import SignUpBackground from '../assets/Banners/SignUp';
 import MailboxIcon from '../assets/icons/mailbox';
+import api from '../Config/api';
+import { useRoute } from '@react-navigation/native';
+
 
 const { width, height } = Dimensions.get('window');
 
 const UserOtpResetScreen = ({ navigation }) => {
+
+  const route = useRoute();
+const { email } = route.params || {};
+console.log('Email from route params:', email);
   const [otp, setOtp] = useState(['', '', '', '']);
   const insets = useSafeAreaInsets();
   const inputRefs = [
@@ -48,13 +55,36 @@ const UserOtpResetScreen = ({ navigation }) => {
     console.log('Resend OTP pressed');
   };
 
-  const handleConfirm = () => {
-    // Handle confirm OTP logic
-    const enteredOtp = otp.join('');
-    console.log('Confirm OTP pressed:', enteredOtp);
-    // Navigate to Create New Password screen
-     navigation.navigate('CreateNewPassword'); // Assuming 'CreateNewPassword' is the next screen route name
-  };
+  const handleConfirm = async () => {
+  const enteredOtp = otp.join('');
+
+  if (enteredOtp.length !== 4) {
+    alert('Please enter the 4-digit OTP');
+    return;
+  }
+
+  try {
+    const response = await api.post('/user/email-verifyOtp', {
+      email,
+      code: enteredOtp,
+    });
+console.log('OTP Verification Response:', response.data);
+    if (response?.data?.success) {
+      alert('OTP Verified Successfully');
+
+      // Navigate to Create New Password screen and pass email if needed
+      navigation.navigate('UserCreateNewPassword', { email });
+    } else {
+      alert(response.data.message || 'Invalid OTP');
+    }
+  } catch (error) {
+    console.error('OTP Verification Failed:', error);
+    const message =
+      error.response?.data?.message || 'Failed to verify OTP. Please try again.';
+    alert(message);
+  }
+};
+
 
   return (
     <View style={styles.container}>
@@ -77,9 +107,9 @@ const UserOtpResetScreen = ({ navigation }) => {
             <MailboxIcon width={53} height={52} />
           </View>
 
-          <Text style={styles.title}>Check Your Mailbox</Text>
+          <Text style={styles.title}>Check Your Mailbox vvvv</Text>
           <Text style={styles.description}>
-            Please enter the 4 digit OTP code that we sent to your
+            Please enter the 4 digit OTP code that we sent to your 
             email (f**************n@gmail.com){/* Placeholder email */}
           </Text>
 

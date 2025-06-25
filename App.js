@@ -92,9 +92,12 @@ import ArtistCreateNewPassword from './Src/HOSTFLOW/Screens/ArtistCreateNewPassw
 import UserBottomTabNavigator from './Src/HOSTFLOW/Components/UserBottomTabNavigator';
 import HostDiscount from './Src/HOSTFLOW/Screens/HostDiscount';
 import UserTicketDownload from './Src/HOSTFLOW/Screens/UserTicketDownload';
+import UserCreateNewpasswordScreen from './Src/HOSTFLOW/Screens/UserCreateNewPassword';
+import {RAZORPAY_KEY_ID, RAZORPAY_SECRET_KEY} from '@env';
+
+
 
 const Stack = createNativeStackNavigator();
-
 // Polyfill for Array.prototype.findLastIndex (Hermes/older JS engines)
 if (!Array.prototype.findLastIndex) {
   Object.defineProperty(Array.prototype, 'findLastIndex', {
@@ -112,6 +115,9 @@ if (!Array.prototype.findLastIndex) {
 }
 
 export default function App() {
+
+
+
   const [isAppInBackground, setIsAppInBackground] = React.useState(false);
   const [showSplash, setShowSplash] = React.useState(true);
   const navigationRef = React.useRef();
@@ -206,6 +212,7 @@ export default function App() {
             <Stack.Screen name="UserCreateProfile" component={UserCreateProfileScreen} />
             <Stack.Screen name="CheckMailBox" component={CheckMailboxScreen} />
             <Stack.Screen name="CreateNewPassword" component={CreateNewPasswordScreen} />
+            <Stack.Screen name="UserCreateNewPassword" component={UserCreateNewpasswordScreen} />
             <Stack.Screen name="UserOtpReset" component={UserOtpResetScreen} />
             <Stack.Screen name="UserHome" component={UserBottomTabNavigator} />
             <Stack.Screen name="MainTabs" component={BottomTabNavigator} />
@@ -216,6 +223,8 @@ export default function App() {
             <Stack.Screen name="GuestList" component={GuestListScreen} />
             <Stack.Screen name="ShortList" component={ShortListScreen} />
             <Stack.Screen name="Profile" component={ProfileScreen} />
+
+
             <Stack.Screen name="UserNotificationScreen" component={UserNotificationScreen} />
             <Stack.Screen name="UserProfileScreen" component={UserProfileScreen} />
             <Stack.Screen name="UserEditProfileScreen" component={UserEditProfileScreen} />
@@ -251,6 +260,7 @@ export default function App() {
             <Stack.Screen name="HostPerfomanceDetails" component={HostPerfomanceDetailsScreen} />
             <Stack.Screen name="ArtistUpload" component={ArtistUpload} />
             <Stack.Screen name="HomeScreen" component={HomeScreen} />
+            <Stack.Screen name="UserHomeScreen" component={UserHomeScreen} />
             <Stack.Screen name="HostVerifiedScreen" component={HostVerifiedScreen} />
             <Stack.Screen name="HostAddPayment" component={HostAddPayment} />
             <Stack.Screen name="ForgotPasswordScreen" component={ForgotPasswordScreen} />  
